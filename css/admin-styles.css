@@ -1,0 +1,31 @@
+.custom-quote-settings-page .form-table th,
+.custom-quote-settings-page .form-table td {
+    /* Add your custom styles here */
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.custom-quote-settings-page input[type="text"],
+.custom-quote-settings-page input[type="email"],
+.custom-quote-settings-page textarea,
+.custom-quote-settings-page select {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.custom-quote-settings-page input[type="submit"] {
+    background-color: #0073aa;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.custom-quote-settings-page input[type="submit"]:hover {
+    background-color: #005177;
+}
