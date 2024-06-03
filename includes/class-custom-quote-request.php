@@ -34,11 +34,11 @@ class Custom_Quote_Request {
 .single-product .single_add_to_cart_button,
 .single-product button.single_add_to_cart_button,
 .single-product a.single_add_to_cart_button {
-	display: none !important;
+    display: none !important;
 }
 </style>
 
-			<?php
+<?php
 		}
 	}
 
@@ -98,22 +98,22 @@ class Custom_Quote_Request {
 		global $product;
 
 		// Get selected products and categories from settings
-		$selected_products   = get_option( 'adas_quote_selected_products', array() );
-		$selected_categories = get_option( 'adas_quote_selected_categories', array() );
+		$selected_products = get_option( 'adas_quote_selected_products', array() );
+		// $selected_categories = get_option( 'adas_quote_selected_categories', array() );
 
 		// Check if the current product's category is in the selected categories
-		$product_categories = wp_get_post_terms(
-			$product->get_id(),
-			'product_cat',
-			array(
-				'fields'       => 'ids',
-				'hierarchical' => true,
-			)
-		);
+		// $product_categories = wp_get_post_terms(
+		// $product->get_id(),
+		// 'product_cat',
+		// array(
+		// 'fields'       => 'ids',
+		// 'hierarchical' => true,
+		// )
+		// );
 
-		if ( ! empty( $selected_categories ) && ! array_intersect( $selected_categories, $product_categories ) ) {
-			return;
-		}
+		// if ( ! empty( $selected_categories ) && ! array_intersect( $selected_categories, $product_categories ) ) {
+		// return;
+		// }
 		// Check if the current product is in the selected products
 		if ( ! empty( $selected_products ) && ! in_array( $product->get_id(), $selected_products ) ) {
 			return;
@@ -250,7 +250,7 @@ class Custom_Quote_Request {
 		$message .= '<a href="' . $quote_post[0]['product_image'] . '" ><img src="' . $quote_post[0]['product_image'] . '" width="100" /></a>';
 		$message .= '</td>';
 		$message .= '<td style="width: 16.66%;padding:10px;text-align: center;border-right:1px solid #e5e5e5;">';
-		$message .= 'sss' . $quote_post[0]['product_name'];
+		$message .= $quote_post[0]['product_name'];
 
 		/*get variable product send to admin email*/
 
@@ -288,7 +288,7 @@ class Custom_Quote_Request {
 					$message .= '<td></td>';
 					$message .= '<td></td>';
 					$message .= '<td></td>';
-					$message .= '<td style="width: 16.66%;padding:10px;text-align: center;border-left:1px solid #e5e5e5;">' . __( 'Page link', AQ ) . '</td>';
+					// $message .= '<td style="width: 16.66%;padding:10px;text-align: center;border-left:1px solid #e5e5e5;">' . __( 'Page link', AQ ) . '</td>';
 					// $current_link = $quote_post[0]['current_url'];
 		// $message                 .= '<td style="width: 16.66%;padding:10px;text-align: center;border-left:1px solid #e5e5e5;"><a href="' . $current_link . '">' . $current_link . '</a></td>';
 		$message             .= '</tr>';

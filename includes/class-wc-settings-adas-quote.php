@@ -34,7 +34,7 @@ function adas_quote_settings_init() {
 	register_setting( 'adas_quote_settings_group', 'adas_quote_hide_price' );
 	register_setting( 'adas_quote_settings_group', 'adas_quote_custom_email_message' );
 	register_setting( 'adas_quote_settings_group', 'adas_quote_admin_email' );
-	// register_setting( 'adas_quote_settings_group', 'adas_quote_selected_products' );
+	register_setting( 'adas_quote_settings_group', 'adas_quote_selected_products' );
 	// register_setting( 'adas_quote_settings_group', 'adas_quote_selected_categories' );
 
 	add_settings_section(
@@ -76,13 +76,13 @@ function adas_quote_settings_init() {
 		'adas_quote_settings_section'
 	);
 
-	// add_settings_field(
-	// 'adas_quote_selected_products',
-	// 'Custom Email Message',
-	// 'adas_quote_selected_products_callback',
-	// 'adas-quote-settings',
-	// 'adas_quote_settings_section'
-	// );
+	add_settings_field(
+		'adas_quote_selected_products',
+		'Select Products for Quote Button',
+		'adas_quote_selected_products_callback',
+		'adas-quote-settings',
+		'adas_quote_settings_section'
+	);
 
 	add_settings_field(
 		'adas_quote_admin_email',
@@ -106,10 +106,60 @@ function adas_quote_settings_init() {
 // echo '<select multiple name="adas_quote_selected_products[]" style="width: 300px;">';
 // foreach ( $products as $product ) {
 // $selected = in_array( $product->get_id(), $selected_products ) ? 'selected' : '';
+// $selected = 'selected';
+
 // echo '<option value="' . esc_attr( $product->get_id() ) . '" ' . $selected . '>' . esc_html( $product->get_title() ) . '</option>';
 // }
 // echo '</select>';
 // }
+function adas_quote_selected_products_callback() {
+	$selected_products = get_option( 'adas_quote_selected_products', array() );
+	$paged             = isset( $_REQUEST['paged'] ) ? absint( $_REQUEST['paged'] ) : 1;
+	$per_page          = 50; // Number of products to display per page
+	$products          = wc_get_products(
+		array(
+			'limit'   => $per_page,
+			'page'    => $paged,
+			'status'  => 'publish',
+			'orderby' => 'title',
+			'order'   => 'ASC',
+		)
+	);
+
+	if ( ! $products ) {
+		_e( 'No products found.', 'text-domain' );
+		return;
+	}
+
+	echo '<select multiple name="adas_quote_selected_products[]" style="width: 300px;">';
+	foreach ( $products as $product ) {
+		$selected = in_array( $product->get_id(), $selected_products ) ? 'selected' : '';
+		echo '<option value="' . esc_attr( $product->get_id() ) . '" ' . $selected . '>' . esc_html( $product->get_name() ) . '</option>';
+	}
+	echo '</select>';
+
+	$total_products = wc_get_products(
+		array(
+			'limit'  => -1,
+			'status' => 'publish',
+			'return' => 'ids',
+		)
+	);
+	$total_pages    = ceil( count( $total_products ) / $per_page );
+
+	echo '<span class="displaying-num">' . sprintf( _n( '1 product', '%s products', count( $total_products ), 'text-domain' ), count( $total_products ) ) . '</span>';
+
+	$pagination_args = array(
+		'base'      => add_query_arg( 'paged', '%#%' ),
+		'format'    => '',
+		'prev_text' => __( '&laquo;', 'text-domain' ),
+		'next_text' => __( '&raquo;', 'text-domain' ),
+		'total'     => $total_pages,
+		'current'   => $paged,
+	);
+
+	echo '<span class="pagination-links">' . paginate_links( $pagination_args ) . '</span>';
+}
 
 // function adas_quote_selected_categories_callback() {
 // $selected_categories = get_option( 'adas_quote_selected_categories', array() );
@@ -158,16 +208,16 @@ function adas_quote_hide_add_to_cart_callback() {
 function adas_quote_settings_page() {
 	?>
 <div class="wrap">
-    <h1>ADAS Quote Settings</h1>
-    <form method="post" action="options.php">
-        <?php
+	<h1>ADAS Quote Settings</h1>
+	<form method="post" action="options.php">
+		<?php
 			settings_fields( 'adas_quote_settings_group' );
 			do_settings_sections( 'adas-quote-settings' );
 			submit_button();
 		?>
-        <input type="hidden" name="adas_quote_clear_settings" value="1">
-        <?php submit_button( 'Clear All Settings', 'delete' ); ?>
-    </form>
+		<input type="hidden" name="adas_quote_clear_settings" value="1">
+		<?php submit_button( 'Clear All Settings', 'delete' ); ?>
+	</form>
 </div>
-<?php
+	<?php
 }
