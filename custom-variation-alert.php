@@ -18,6 +18,9 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-wc-settings-adas-quot
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-custom-quote-request_enqueue.php';
 
+// Include the functions.php file
+require_once plugin_dir_path( __FILE__ ) . 'includes/functions.php';
+
 // Initialize the plugin
 add_action( 'plugins_loaded', array( 'Custom_Quote_Request', 'init' ) );
 
