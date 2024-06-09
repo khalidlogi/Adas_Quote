@@ -10,6 +10,8 @@ class Custom_Quote_Request {
 	public static function init() {
 		// error_log( 'Custom_Quote_Request class init' );
 
+		add_action( 'template_redirect', array( __CLASS__, 'get_current_page_id' ) );
+
 		// Hook to enqueue scripts
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
 
@@ -18,7 +20,7 @@ class Custom_Quote_Request {
 		}
 
 		// Hook to add custom form with _add_to_quote button
-		add_action( 'woocommerce_single_product_summary', array( __CLASS__, 'display_quote_button_form' ), 25 );
+		// add_action( 'woocommerce_single_product_summary', array( __CLASS__, 'display_quote_button_form' ), 25 );
 
 		add_action( 'wp_footer', array( __CLASS__, 'AQ_hide_add_to_cart_button' ) );
 
@@ -34,11 +36,11 @@ class Custom_Quote_Request {
 .single-product .single_add_to_cart_button,
 .single-product button.single_add_to_cart_button,
 .single-product a.single_add_to_cart_button {
-	display: none !important;
+    display: none !important;
 }
 </style>
 
-			<?php
+<?php
 		}
 	}
 
@@ -48,26 +50,40 @@ class Custom_Quote_Request {
 		$table_name = $wpdb->prefix . 'kh_woo';
 
 		// Check if the table already exists
-		if ( $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'" ) != $table_name ) {
+		$table_name = $wpdb->prefix . 'kh_woo';
 
-			// Table doesn't exist, so create it
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'" ) != $table_name ) {
 			$charset_collate = $wpdb->get_charset_collate();
 
 			$sql = "CREATE TABLE $table_name (
-                 id mediumint(9) NOT NULL AUTO_INCREMENT,
-            product_id mediumint(9) NOT NULL,
-            product_name text NOT NULL,
-            product_quantity mediumint(9)  NULL,
-            product_type text  NULL,
-            product_image text  NULL,
-            variation_id mediumint(9)  NULL,
-            variations_attr text  NULL,
-            message_quote text  NULL,
-            PRIMARY KEY  (id)
+                id mediumint(9) NOT NULL AUTO_INCREMENT,
+                product_id mediumint(9) NOT NULL,
+                product_name text NOT NULL,
+                product_quantity mediumint(9) NULL,
+                product_type text NULL,
+                product_image text NULL,
+                user_email text NOT NULL,
+                phone_number text NULL,
+                variation_id mediumint(9) NULL,
+                variations_attr text NULL,
+                message_quote text NULL,
+                date_submitted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        read_status INT DEFAULT 0,
+        read_date TIMESTAMP NULL,                
+        page_id varchar(255) NOT NULL,
+                PRIMARY KEY (id),
+                KEY product_id (product_id),
+                KEY variation_id (variation_id),
+                KEY date_submitted (date_submitted)
             ) $charset_collate;";
 
 			require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 			dbDelta( $sql );
+
+			// Check for errors during table creation
+			if ( $wpdb->last_error !== '' ) {
+				error_log( 'Error creating table: ' . $wpdb->last_error );
+			}
 		}
 	}
 
@@ -94,6 +110,9 @@ class Custom_Quote_Request {
 		);
 	}
 
+
+
+	/*
 	public static function display_quote_button_form() {
 		global $product;
 
@@ -211,7 +230,7 @@ class Custom_Quote_Request {
 				echo '<input type="hidden" name="action" value="adas_send_quote" />';
 
 				echo '<input type="hidden" id="adas_quote_nonce" name="adas_quote_nonce"
-    value="' . esc_attr( wp_create_nonce( 'adas_quote_action' ) ) . '" />';
+	value="' . esc_attr( wp_create_nonce( 'adas_quote_action' ) ) . '" />';
 
 				echo '<button type="submit" class="custom-quote-button">_add_to_quote</button>';
 				echo '</form>';
@@ -222,6 +241,7 @@ class Custom_Quote_Request {
 	}
 			// modal
 
+			*/
 	public static function send_email( $data ) {
 		$message = '<p style="font-size: 16px;">You have requested a quote for the following product:</p>';
 
@@ -318,6 +338,12 @@ class Custom_Quote_Request {
 			wp_mail( $admin_email, __( 'Quote Enquiry', AQ ), $message, $headers, $attachments );
 		}
 	}
+
+	public static function get_current_page_id() {
+		// return wc_get_product_id_by_url();
+	}
+
+
 	public static function handle_quote_request() {
 		global $wpdb;
 
@@ -329,13 +355,26 @@ class Custom_Quote_Request {
 
 			// Get data from AJAX request
 
-		$product_id       = sanitize_text_field( $_POST['product_id'] );
+		$product_id = sanitize_text_field( $_POST['product_id'] );
+		error_log( 'handle_quote_request $product_id: ' . print_r( $product_id, true ) );
+		error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
 		$product_name     = sanitize_text_field( stripslashes( $_POST['product_name'] ) );
 		$product_quantity = sanitize_text_field( $_POST['product_quantity'] );
+		$useremail        = sanitize_text_field( $_POST['useremail'] );
+		$phone_number     = sanitize_text_field( $_POST['phone_number'] );
+		error_log('$phone_number : ' . print_r($phone_number , true)); 
+		error_log('in ' . __FILE__ . ' on line ' . __LINE__); 
 		$product_type     = sanitize_text_field( $_POST['product_type'] );
 		$product_image    = sanitize_text_field( $_POST['product_image'] );
 		$variation_id     = sanitize_text_field( $_POST['variation_id'] );
 		// $current_url      = $_POST['current_url'];
+			// Get the current page ID
+		// $id      = self::get_current_page_id();
+		$page_id = get_permalink( $id );
+			error_log( '$page_url: ' . print_r( $page_id, true ) );
+			error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
+
+		$date_submitted = current_time( 'mysql' );
 
 		$message_quote   = sanitize_text_field( $_POST['message_quote'] );
 		$variations_attr = json_decode( stripslashes( $_POST['variations_attr'] ), true );
@@ -345,6 +384,10 @@ class Custom_Quote_Request {
 			'product_id'       => $product_id,
 			'product_name'     => $product_name,
 			'product_quantity' => $product_quantity,
+			'user_email'       => $useremail,
+            'phone_number' => $phone_number,
+			'date_submitted'   => $date_submitted,
+			'page_id'          => get_permalink( $product_id ), // Get the permalink of the current page
 			'product_type'     => $product_type,
 			'product_image'    => $product_image,
 			'variation_id'     => $variation_id,

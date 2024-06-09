@@ -37,6 +37,7 @@ jQuery(document).ready(function ($) {
 
     // Handle form submission via AJAX
     $('#custom-quote-form').on('submit', function (event) {
+        alert('Form submitted');
         event.preventDefault(); // Prevent the default form submission
 //alert($('#custom-quote-form textarea[name="message_quote"]').val());
         //var $product_quantity = $('.single-product').find('form.cart').find('.quantity').find('input[type="number"]').val();
@@ -51,6 +52,8 @@ jQuery(document).ready(function ($) {
             product_id: $('#custom-quote-form input[name="product_id"]').val(),
             product_name: $('#custom-quote-form input[name="product_name"]').val(),
             message_quote: $('#custom-quote-form textarea[name="message_quote"]').val(),
+            useremail: $('#custom-quote-form input[name="adas_user_email"]').val(),
+            phone_number: $('#custom-quote-form input[name="phone_number"]').val(),
             variation_id: $('#quote_variation_id').val(),
             variations_attr: $('#variationsAttr').val(),
             useremail: $('#custom-quote-form input[name="adas_user_email"]').val(),
@@ -66,6 +69,7 @@ jQuery(document).ready(function ($) {
             type: 'POST',
             data: formData,
             success: function (response) {
+                alert(phone_number);
                 console.log('AJAX Response:', response); // Debugging: Inspect response
 
                 if (response.success) {

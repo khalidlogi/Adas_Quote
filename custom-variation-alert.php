@@ -11,6 +11,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
+
+add_action( 'init', 'adas_db_init' );
+
+function adas_db_init() {
+	if ( is_admin() ) {
+		require_once 'adas-quote-wplist.php';
+		require_once 'includes/adas-quote-details.php';
+		require_once 'includes/adas-quote-details-ufd.php';
+	}
+}
+
 // Include the main class file
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-custom-quote-request.php';
 
@@ -20,6 +31,8 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-custom-quote-request_
 
 // Include the functions.php file
 require_once plugin_dir_path( __FILE__ ) . 'includes/functions.php';
+
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-shortcode-request.php';
 
 // Initialize the plugin
 add_action( 'plugins_loaded', array( 'Custom_Quote_Request', 'init' ) );

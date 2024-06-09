@@ -29,3 +29,162 @@
 .custom-quote-settings-page input[type="submit"]:hover {
     background-color: #005177;
 }
+
+
+/*style the detail quote page */
+
+.custom-quote-settings-page .form-table th,
+.custom-quote-settings-page .form-table td {
+    /* Add your custom styles here */
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.custom-quote-settings-page input[type="text"],
+.custom-quote-settings-page input[type="email"],
+.custom-quote-settings-page textarea,
+.custom-quote-settings-page select {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.custom-quote-settings-page input[type="submit"] {
+    background-color: #0073aa;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.custom-quote-settings-page input[type="submit"]:hover {
+    background-color: #005177;
+}
+
+
+/*style the detail quote page */
+
+.adas-form-details-wrap {
+    font-size: 16px;
+}
+.form-information span {
+    margin-left: 1em;
+}
+.adas-form-details-wrapper {
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+.cfdb7-panel {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    padding: 20px;
+    border-radius: 5px;
+}
+.cfdb7-panel-content {
+    margin: 0;
+}
+.welcome-panel-column-container {
+    display: flex;
+    flex-direction: column;
+}
+.welcome-panel-column-container h3 {
+    margin-top: 0;
+}.custom-quote-settings-page .form-table th,
+.custom-quote-settings-page .form-table td {
+    /* Add your custom styles here */
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.custom-quote-settings-page input[type="text"],
+.custom-quote-settings-page input[type="email"],
+.custom-quote-settings-page textarea,
+.custom-quote-settings-page select {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.custom-quote-settings-page input[type="submit"] {
+    background-color: #0073aa;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.custom-quote-settings-page input[type="submit"]:hover {
+    background-color: #005177;
+}
+
+
+/*style the detail quote page */
+
+.adas-form-details-wrap {
+    font-size: 16px;
+}
+.form-information span {
+    margin-left: 1em;
+}
+.adas-form-details-wrapper {
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+.cfdb7-panel {
+    background: #fff;
+    position: relative;
+    border: 1px solid #e5e5e5;
+    padding: 20px;
+    border-radius: 5px;
+}
+.cfdb7-panel-content {
+    margin: 0;
+}
+.welcome-panel-column-container {
+    display: flex;
+    flex-direction: column;
+}
+.welcome-panel-column-container h3 {
+    margin-top: 0;
+}
+.welcome-panel-column-container p {
+    margin: 10px 0;
+}
+.welcome-panel-column-container img {
+ margin: 18px;
+}
+
+.title-image {
+    top: 20px;
+    position: relative; 
+    right: 20px;
+    position: absolute;
+}
+.welcome-panel-column-container p {
+    margin: 10px 0;
+}
+.welcome-panel-column-container img {
+    text-align: center;
+    margin-left: 21%;
+    border: 1px dotted gray;
+    border-radius: 50%;
+}
+
+p.product_name {
+    font-weight: bold;
+    font-size: 1.1em;
+}
