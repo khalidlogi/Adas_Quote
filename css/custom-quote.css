@@ -56,3 +56,13 @@
 .custom-quote-form input[type="submit"]:hover {
     background-color: #005177;
 }
+
+
+.error-highlight {
+    border: 1px solid red;
+}
+.error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+}

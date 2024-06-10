@@ -171,6 +171,7 @@
 .title-image {
     top: 20px;
     position: relative; 
+    text-align: center;
     right: 20px;
     position: absolute;
 }

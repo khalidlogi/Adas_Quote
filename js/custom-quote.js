@@ -1,54 +1,82 @@
 jQuery(document).ready(function ($) {
-
-    // Select the WooCommerce quantity input
-    const wooCommerceQuantityInput = $('.single-product').find('form.cart').find('.quantity').find('input[type="number"]');
-
-    // Select the custom input field
+    const wooCommerceQuantityInput = $('.single-product form.cart .quantity input[type="number"]');
     const customQuantityInput = $('.product_quantity');
-  
-    // Function to update the custom input field value
+
     function updateCustomQuantityInput() {
-      const selectedQuantity = wooCommerceQuantityInput.val();
-      customQuantityInput.val(selectedQuantity);
+        const selectedQuantity = wooCommerceQuantityInput.val();
+        customQuantityInput.val(selectedQuantity);
     }
-  
-    // Attach the update function to the 'change' event of the quantity input
+
     wooCommerceQuantityInput.on('change', updateCustomQuantityInput);
 
-    // Event listener for variation change
     $('form.variations_form').on('found_variation', function (event, variation) {
         let selectedVariations = {};
         $('.variations_form .variations select').each(function () {
             let attributeName = $(this).attr('name').replace('attribute_pa_', '');
-
             let attributeValue = $(this).val();
             selectedVariations[attributeName] = attributeValue;
         });
 
-        // Convert variations data to JSON string
         let variationsJSON = JSON.stringify(selectedVariations);
-
-        // Set the value of the hidden input field
         $('#variationsAttr').val(variationsJSON);
-
-        // Set the variation ID in the hidden input field
         $('#quote_variation_id').val(variation.variation_id);
     });
 
-    // Handle form submission via AJAX
-    $('#custom-quote-form').on('submit', function (event) {
-        alert('Form submitted');
-        event.preventDefault(); // Prevent the default form submission
-//alert($('#custom-quote-form textarea[name="message_quote"]').val());
-        //var $product_quantity = $('.single-product').find('form.cart').find('.quantity').find('input[type="number"]').val();
-        //$('.single-product').find('form.custom-quote-form').find('input[name="product_quantity"]').val($product_quantity).change();
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
 
+    function isValidPhoneNumber(phone) {
+        const phoneRegex = /^[0-9\-\+\(\) ]{7,15}$/;
+        return phoneRegex.test(phone);
+    }
+
+    function validateForm(formData) {
+        let errors = [];
+
+        if (!formData.product_quantity || isNaN(formData.product_quantity) || formData.product_quantity <= 0) {
+            errors.push({ field: 'product_quantity', message: "Please enter a valid product quantity." });
+        }
+        if (!formData.product_name) {
+            errors.push({ field: 'product_name', message: "Product name is required." });
+        }
+        if (!formData.useremail || !isValidEmail(formData.useremail)) {
+            errors.push({ field: 'adas_user_email', message: "Please enter a valid email address." });
+        }
+        if (!formData.phone_number || !isValidPhoneNumber(formData.phone_number)) {
+            errors.push({ field: 'phone_number', message: "Please enter a valid phone number." });
+        }
+        if (!formData.message_quote) {
+            errors.push({ field: 'message_quote', message: "Please enter a message." });
+        }
+
+        return errors;
+    }
+
+    function highlightErrorFields(errors) {
+        errors.forEach(error => {
+            const field = $(`#custom-quote-form [name="${error.field}"]`);
+            field.addClass('error-highlight');
+            field.after(`<span class="error-message">${error.message}</span>`);
+        });
+    }
+
+    function clearErrorHighlights() {
+        $('#custom-quote-form .error-highlight').removeClass('error-highlight');
+        $('#custom-quote-form .error-message').remove();
+    }
+
+    $('#custom-quote-form').on('submit', function (event) {
+        event.preventDefault();
+
+        clearErrorHighlights();
 
         let formData = {
             action: 'handle_quote_request',
-            product_quantity : $('#custom-quote-form input[name="product_quantity"]').val(),
-            product_type : $('#custom-quote-form input[name="product_type"]').val(),
-            product_image : $('#custom-quote-form input[name="product_image"]').val(),
+            product_quantity: $('#custom-quote-form input[name="product_quantity"]').val(),
+            product_type: $('#custom-quote-form input[name="product_type"]').val(),
+            product_image: $('#custom-quote-form input[name="product_image"]').val(),
             product_id: $('#custom-quote-form input[name="product_id"]').val(),
             product_name: $('#custom-quote-form input[name="product_name"]').val(),
             message_quote: $('#custom-quote-form textarea[name="message_quote"]').val(),
@@ -56,37 +84,38 @@ jQuery(document).ready(function ($) {
             phone_number: $('#custom-quote-form input[name="phone_number"]').val(),
             variation_id: $('#quote_variation_id').val(),
             variations_attr: $('#variationsAttr').val(),
-            useremail: $('#custom-quote-form input[name="adas_user_email"]').val(),
-            //current_url: window.location.href // Pass the current URL
-
-            custom_quote_request_nonce: $('#custom-quote-form input[name="adas_quote_nonce"]').val() // Include nonce
+            custom_quote_request_nonce: $('#custom-quote-form input[name="adas_quote_nonce"]').val()
         };
 
-       // console.log('Form Data:', formData); // Debugging: Inspect form data
+        const errors = validateForm(formData);
+        if (errors.length > 0) {
+            highlightErrorFields(errors);
+            return;
+        }
 
         $.ajax({
             url: custom_quote_params.ajax_url,
             type: 'POST',
             data: formData,
             success: function (response) {
-                alert(phone_number);
-                console.log('AJAX Response:', response); // Debugging: Inspect response
+                console.log('AJAX Response:', response);
 
                 if (response.success) {
-                   //alert('Quote request sent successfully!');
                     console.log(response.data);
-
-                      // Trigger the modal with JavaScript
-                      $('#quoteSuccessModal').modal('show');
-
+                    $('#quoteSuccessModal').modal('show');
                 } else {
                     alert('Failed to send quote request: ' + response.data);
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                console.log('AJAX Error:', textStatus, errorThrown); // Debugging: Inspect error
+                console.log('AJAX Error:', textStatus, errorThrown);
                 alert('An error occurred while sending the quote request.');
             }
         });
+    });
+
+    $('#custom-quote-form').on('focus', '.error-highlight', function () {
+        $(this).removeClass('error-highlight');
+        $(this).next('.error-message').remove();
     });
 });

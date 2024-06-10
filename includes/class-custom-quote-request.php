@@ -222,24 +222,7 @@ class Custom_Quote_Request {
 				// email
 				echo '<input type="text" name="adas_user_email" id="adas_user_email" value="' . $user_email . '">';
 
-		if ( $product->is_type( 'variable' ) ) {
-			echo '<input type="text" placeholder="variation_id" name="variation_id" id="quote_variation_id">';
-			echo '<input type="text" name="variations_attr" id="variationsAttr">';
-		}
-				echo '<textarea name="message_quote" style="width: 100%;" placeholder="Additional Notes"></textarea>';
-				echo '<input type="hidden" name="action" value="adas_send_quote" />';
-
-				echo '<input type="hidden" id="adas_quote_nonce" name="adas_quote_nonce"
-	value="' . esc_attr( wp_create_nonce( 'adas_quote_action' ) ) . '" />';
-
-				echo '<button type="submit" class="custom-quote-button">_add_to_quote</button>';
-				echo '</form>';
-				echo '</div>';
-
-				// Include the modal HTML
-				include plugin_dir_path( __FILE__ ) . 'quote-success-modal.php';
-	}
-			// modal
+		if ( $product->is
 
 			*/
 	public static function send_email( $data ) {
