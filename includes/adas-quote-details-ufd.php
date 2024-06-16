@@ -20,16 +20,12 @@ class Adas_Quote_Form_Details_Ufd {
 	 * @var int
 	 */
 	private $quote_id;
-	private $product_id;
-
 	/**
-	 * The ID of the form quote this record is associated with.
+	 * The ID of the product associated with the form.
 	 *
-	 * @var string
+	 * @var int
 	 */
-	private $form_post_id;
-
-	private $adasclientemail;
+	private $product_id;
 	/**
 	 * Adas_Form_Details_Ufd constructor.
 	 *
@@ -93,20 +89,19 @@ class Adas_Quote_Form_Details_Ufd {
 			$unserialized_data = unserialize( $serialized_data );
 
 			$form_values = array(
-				'product_id'       => $product_id,
-				'id'               => $id,
-				'read_status'      => $result->read_status,
-				'date_submitted'   => $result->date_submitted,
-				'date'             => $date,
-				'message_quote'    => $result->message_quote,
-				'data'             => $unserialized_data,
-				'user_email'       => $result->user_email,
-				'phone_number'     => $result->phone_number,
-				'product_name'     => $result->product_name,
-				'product_quantity' => $result->product_quantity,
-				'product_type'     => $result->product_type,
-				'product_image'    => $result->product_image,
-				'',
+				'product_id'       => sanitize_text_field( $product_id ),
+				'id'               => absint( $id ),
+				'read_status'      => sanitize_text_field( $result->read_status ),
+				'date_submitted'   => sanitize_text_field( $result->date_submitted ),
+				'date'             => sanitize_text_field( $date ),
+				'message_quote'    => sanitize_textarea_field( $result->message_quote ),
+				'data'             => array_map( 'sanitize_text_field', $unserialized_data ),
+				'user_email'       => sanitize_email( $result->user_email ),
+				'phone_number'     => sanitize_text_field( $result->phone_number ),
+				'product_name'     => sanitize_text_field( $result->product_name ),
+				'product_quantity' => absint( $result->product_quantity ),
+				'product_type'     => sanitize_text_field( $result->product_type ),
+				'product_image'    => esc_url( $result->product_image ),
 			);
 		}
 
@@ -191,7 +186,7 @@ class Adas_Quote_Form_Details_Ufd {
 		}
 
 		// if ( ! empty( $read_status ) ) {
-		// 	echo '<p><b>Read Status:</b> ' . esc_html( $read_status ) . '</p>';
+		// echo '<p><b>Read Status:</b> ' . esc_html( $read_status ) . '</p>';
 		// }
 		if ( ( $results ) ) {
 			$form_data = ( $results );

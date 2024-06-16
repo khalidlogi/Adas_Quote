@@ -1,16 +1,23 @@
 <?php
 class Custom_Bootstrap_Enqueue {
+	/**
+	 * Initialize the class by setting up the necessary actions.
+	 */
 	public static function init() {
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'adas_quote_admin_styles' ) );
 	}
 
-
+	/**
+	 * Enqueue custom CSS for the admin settings page.
+	 */
 	public static function adas_quote_admin_styles() {
-		// Enqueue custom CSS for the admin settings page
 		wp_enqueue_style( 'adas-quote-admin-styles', plugin_dir_url( __FILE__ ) . '../css/admin-styles.css' );
 	}
 
+	/**
+	 * Enqueue necessary scripts and styles for the front-end.
+	 */
 	public static function enqueue_scripts() {
 		// Ensure jQuery is enqueued
 		wp_enqueue_script( 'jquery' );
