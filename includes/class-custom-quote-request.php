@@ -36,11 +36,11 @@ class Custom_Quote_Request {
 .single-product .single_add_to_cart_button,
 .single-product button.single_add_to_cart_button,
 .single-product a.single_add_to_cart_button {
-    display: none !important;
+	display: none !important;
 }
 </style>
 
-<?php
+			<?php
 		}
 	}
 
@@ -112,119 +112,6 @@ class Custom_Quote_Request {
 
 
 
-	/*
-	public static function display_quote_button_form() {
-		global $product;
-
-		// Use the PluginToolbox class
-		$all_category_ids = PluginToolbox::displayAllProductCategories();
-		error_log( '$all_category_ids: ' . print_r( $all_category_ids, true ) );
-		error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
-		// print_r( 'ssss' . $all_category_ids );
-
-		// Get selected products and categories from settings.
-		$selected_products = get_option( 'adas_quote_selected_products', array() );
-		error_log( '$selected_products: ' . print_r( $selected_products, true ) );
-		error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
-		$selected_categories = get_option( 'adas_quote_selected_categories', array() );
-
-		$categories = get_terms(
-			array(
-				'taxonomy'   => 'product_cat',
-				'hide_empty' => false,
-			)
-		);
-
-		$product_categories = get_the_terms( $product->get_id(), 'product_cat' );
-		// Get all the categories
-		$all_categories = get_categories();
-
-		// Loop through the categories and display them
-		if ( ! empty( $all_categories ) ) {
-			echo '<ul>';
-			foreach ( $all_categories as $category ) {
-				echo '<li>Category ID: ' . $category->term_id . ', Category Name: ' . $category->name . '</li>';
-			}
-			echo '</ul>';
-		} else {
-			echo 'No categories found.';
-		}
-
-		$category_id = array();
-		// Check if any categories were found
-		if ( ! empty( $product_categories ) ) {
-			// Loop through the categories
-			foreach ( $product_categories as $category ) {
-				// Access category properties
-				$category_id[] = $category->term_id;
-				error_log( '$category_id[]: ' . print_r( $category->term_id, true ) );
-				error_log( '$name[]: ' . print_r( $category->name, true ) );
-			}
-		}
-
-				$intersection = array_intersect( $category_id, explode( ',', $selected_categories[0] ) );
-				error_log( ' $selected_products: ' . print_r( $selected_products, true ) );
-		error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
-		error_log( ' $product->get_id(): ' . print_r( $product->get_id(), true ) );
-		error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
-
-		if ( empty( $intersection ) && ! in_array( $product->get_id(), $selected_products ) ) {
-
-			error_log( 'Array A does not have any element that is present in Array B.' );
-			return;     }
-
-				$product_type = '';
-				$product_     = '';
-
-		if ( function_exists( 'get_product' ) ) {
-			$product_     = wc_get_product( get_the_ID() );
-			$product_type = ( $product_->get_type() ) ? 'variation' : $product_->get_type();
-			if ( $product_->is_type( 'variable' ) ) {
-				$class = '_hide';
-			}
-		}
-
-				// get user email.
-		if ( is_user_logged_in() ) {
-			$current_user = wp_get_current_user();
-			$user_email   = $current_user->user_email;
-		} else {
-			$user_email = '';
-		}
-
-				$product_image_url = wp_get_attachment_image_src( get_post_thumbnail_id( get_the_ID() ), 'thumbnail' );
-		if ( $product_image_url && isset( $product_image_url ) ) {
-			$post_thumb = $product_image_url[0];
-			error_log( 'product_image_url: ' . print_r( $post_thumb, true ) );
-			error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
-		} else {
-			$post_thumb = '';
-		}
-
-				// Only run for variable products.
-
-				echo '<div class="custom-quote-form-wrapper">';
-				echo '<form id="custom-quote-form" class="custom-quote-form" action="" method="post">';
-
-				echo '<input type="text" name="action" value="custom_quote_request">';
-
-				echo '<input placeholder="product_name" type="text" name="product_name" value="' . esc_attr( $product->get_name() ) . '">';
-
-				echo '<input type="text" name="product_image" value="' . $post_thumb . '"  />';
-
-				echo '<input type="text" name="product_link" value="' . get_permalink() . '"  />';
-
-				echo '<input type="text" name="product_type" class="product_type" value="' . $product_type . '"  />';
-
-				echo '<input type="text" name="product_id" value="' . esc_attr( $product->get_id() ) . '">';
-				echo '<input type="text" class="product_quantity" name="product_quantity" placeholder="Quantity" value="1">';
-
-				// email
-				echo '<input type="text" name="adas_user_email" id="adas_user_email" value="' . $user_email . '">';
-
-		if ( $product->is
-
-			*/
 	public static function send_email( $data ) {
 		$message = '<p style="font-size: 16px;">You have requested a quote for the following product:</p>';
 
@@ -345,11 +232,11 @@ class Custom_Quote_Request {
 		$product_quantity = sanitize_text_field( $_POST['product_quantity'] );
 		$useremail        = sanitize_text_field( $_POST['useremail'] );
 		$phone_number     = sanitize_text_field( $_POST['phone_number'] );
-		error_log('$phone_number : ' . print_r($phone_number , true)); 
-		error_log('in ' . __FILE__ . ' on line ' . __LINE__); 
-		$product_type     = sanitize_text_field( $_POST['product_type'] );
-		$product_image    = sanitize_text_field( $_POST['product_image'] );
-		$variation_id     = sanitize_text_field( $_POST['variation_id'] );
+		error_log( '$phone_number : ' . print_r( $phone_number, true ) );
+		error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
+		$product_type  = sanitize_text_field( $_POST['product_type'] );
+		$product_image = sanitize_text_field( $_POST['product_image'] );
+		$variation_id  = sanitize_text_field( $_POST['variation_id'] );
 		// $current_url      = $_POST['current_url'];
 			// Get the current page ID
 		// $id      = self::get_current_page_id();
@@ -368,7 +255,7 @@ class Custom_Quote_Request {
 			'product_name'     => $product_name,
 			'product_quantity' => $product_quantity,
 			'user_email'       => $useremail,
-            'phone_number' => $phone_number,
+			'phone_number'     => $phone_number,
 			'date_submitted'   => $date_submitted,
 			'page_id'          => get_permalink( $product_id ), // Get the permalink of the current page
 			'product_type'     => $product_type,

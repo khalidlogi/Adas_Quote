@@ -190,9 +190,9 @@ class Adas_Quote_Form_Details_Ufd {
 			echo '<p><b>Submission Date:</b> ' . esc_html( $date_submitted ) . '</p>';
 		}
 
-		if ( ! empty( $read_status ) ) {
-			echo '<p><b>Read Status:</b> ' . esc_html( $read_status ) . '</p>';
-		}
+		// if ( ! empty( $read_status ) ) {
+		// 	echo '<p><b>Read Status:</b> ' . esc_html( $read_status ) . '</p>';
+		// }
 		if ( ( $results ) ) {
 			$form_data = ( $results );
 		}

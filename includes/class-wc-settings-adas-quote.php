@@ -30,21 +30,23 @@ add_action( 'admin_init', 'adas_quote_settings_init' );
 // }
 // }
 function adas_quote_settings_init() {
+
+	// a:3:{i:0;s:2:"38";i:1;s:8:"36,37,38";i:2;s:2:"37";}
 	register_setting( 'adas_quote_settings_group', 'adas_quote_hide_add_to_cart' );
 	register_setting( 'adas_quote_settings_group', 'adas_quote_hide_price' );
 	register_setting( 'adas_quote_settings_group', 'adas_quote_custom_email_message' );
 	register_setting( 'adas_quote_settings_group', 'adas_quote_admin_email' );
 	register_setting( 'adas_quote_settings_group', 'adas_quote_selected_products' );
 	register_setting( 'adas_quote_settings_group', 'adas_quote_selected_categories' );
-	register_setting( 'adas_quote_settings_group', 'adas_quote_display_categories' );
+	// register_setting( 'adas_quote_settings_group', 'adas_quote_display_categories' );
 
-	add_settings_field(
-		'adas_quote_display_categories',
-		'Display All Categories',
-		'adas_quote_display_categories_callback',
-		'adas-quote-settings',
-		'adas_quote_settings_section'
-	);
+	// add_settings_field(
+	// 'adas_quote_display_categories',
+	// 'Display All Categories',
+	// 'adas_quote_display_categories_callback',
+	// 'adas-quote-settings',
+	// 'adas_quote_settings_section'
+	// );
 
 	add_settings_section(
 		'adas_quote_settings_section',
@@ -102,16 +104,16 @@ function adas_quote_settings_init() {
 	);
 }
 
-function adas_quote_display_categories_callback() {
-	$selected_products = get_option( 'adas_quote_selected_products', array() );
+// function adas_quote_display_categories_callback() {
+// $selected_products = get_option( 'adas_quote_selected_products', array() );
 
-	PluginToolbox::displayAllProductCategories();
-	$cat = PluginToolbox::getAdasQuoteSelectedCategories();
-	print_r( $cat );
-	echo '<br>';
-	echo 'selected_products: ';
-	print_r( $selected_products );
-}
+// PluginToolbox::displayAllProductCategories();
+// $cat = PluginToolbox::getAdasQuoteSelectedCategories();
+// print_r( $cat );
+// echo '<br>';
+// echo 'selected_products: ';
+// print_r( $selected_products );
+// }
 /**
  * Callback function for displaying the selected product categories in a multi-select dropdown.
  *
@@ -124,8 +126,50 @@ function adas_quote_display_categories_callback() {
  * @return void
  */
 function adas_quote_selected_categories_callback() {
+	global $wp_query;
+
+	// Get the current product category from the query
+	$current_product_cat = isset( $wp_query->query['product_cat'] ) ? $wp_query->query['product_cat'] : '';
+	error_log( '$current_product_cat: ' . print_r( $current_product_cat, true ) );
+	error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
+
+	// Default arguments for get_terms
+	$defaults = array(
+		'pad_counts'         => 1,
+		'show_count'         => 1,
+		'hierarchical'       => 1,
+		'hide_empty'         => 1,
+		'show_uncategorized' => 1,
+		'orderby'            => 'name',
+		'selected'           => $current_product_cat,
+		'menu_order'         => false,
+	);
+
+	// Parse arguments and get terms
+	$args  = wp_parse_args( array(), $defaults );
+	$terms = get_terms( array_merge( array( 'taxonomy' => 'product_cat' ), $args ) );
+
+	$saved_product_cat = get_option( 'adas_quote_selected_categories', '' );
+
+	// Start building the output for the dropdown
+	$output  = "<select name='adas_quote_selected_categories' class='dropdown_product_cat'>";
+	$output .= '<option value="" ' . selected( $saved_product_cat, '', false ) . '>' . __( 'Select a category', 'woocommerce' ) . '</option>';
+	$output .= wc_walk_category_dropdown_tree( $terms, 0, array_merge( $args, array( 'selected' => $saved_product_cat ) ) );
+
+	$output .= '</select>';
+	// Echo the output
+	echo $output;
+}
+
 	// Retrieve the selected product categories from the WordPress options
-	$selected_categories = get_option( 'adas_quote_selected_categories', array() );
+
+	/*
+	$selected_categories        = get_option( 'adas_quote_selected_categories', array() );
+	$selected_categories_explod = explode( ',', $selected_categories[0] );
+	error_log( '$selected_categories_explod: ' . print_r( $selected_categories_explod, true ) );
+	error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
+	error_log( '$selected_categories: ' . print_r( $selected_categories, true ) );
+	error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
 
 	// Retrieve all the product categories
 	$categories = get_terms(
@@ -157,12 +201,15 @@ function adas_quote_selected_categories_callback() {
 		// Check if the current category is selected
 		$selected = in_array( $category->term_id, explode( ',', $selected_categories[0] ) ) ? 'selected' : '';
 
-		// Combine the category ID and its children IDs into a comma-separated string
-		$ids = array( $category->term_id );
+			// Combine the category ID and its children IDs into a comma-separated string
+			$ids = array( $category->term_id );
 		if ( ! empty( $children ) ) {
 			$ids = array_merge( $ids, $children );
 		}
-		$ids = implode( ',', $ids );
+
+			error_log( '$ids: ' . print_r( $ids, true ) );
+
+		$ids = $ids;// implode( ',', $ids );
 
 		// Display the category in the dropdown, with the selected status
 		echo '<option value="' . esc_attr( $ids ) . '" ' . esc_attr( $selected ) . '>' . esc_html( $category->name ) . ' id: ' . esc_html( ( $category->term_id ) ) . '</option>';
@@ -170,11 +217,13 @@ function adas_quote_selected_categories_callback() {
 		// Debug output for the category ID
 		error_log( '$category->term_id: ' . print_r( $category->term_id, true ) );
 		error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
-	}
+
+		*/
+
 
 	// Close the multi-select dropdown
-	echo '</select>';
-}
+
+
 
 function adas_quote_selected_products_callback() {
 	$selected_products = get_option( 'adas_quote_selected_products', array() );
@@ -274,17 +323,17 @@ function adas_quote_settings_page() {
 
 <div class="wrap custom-quote-settings-page">
 
-    <div class="wrap">
-        <h1>ADAS Quote Settings</h1>
-        <form method="post" action="options.php">
-            <?php
+	<div class="wrap">
+		<h1>ADAS Quote Settings</h1>
+		<form method="post" action="options.php">
+			<?php
 			settings_fields( 'adas_quote_settings_group' );
 			do_settings_sections( 'adas-quote-settings' );
 			submit_button();
 			?>
 
-        </form>
-    </div>
+		</form>
+	</div>
 </div>
-<?php
+	<?php
 }

@@ -180,12 +180,12 @@
 }
 .welcome-panel-column-container img {
     text-align: center;
-    margin-left: 21%;
+    /* margin-left: 21%; */
     border: 1px dotted gray;
     border-radius: 50%;
 }
 
 p.product_name {
     font-weight: bold;
-    font-size: 1.1em;
-}
+    color: #6a6ae8;
+    font-size: 1.31em;}

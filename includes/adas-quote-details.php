@@ -54,14 +54,14 @@ class Adas_Quote_Form_Details {
 		$list_table->prepare_items();
 		?>
 <div class="wrap">
-	<h2>Quotes submitted for : <b><?php echo esc_html( $product->get_title() ); ?></b></h2>
+    <h2>Quotes submitted for : <b><?php echo esc_html( $product->get_title() ); ?></b></h2>
 
-	</h2>
-	<form method="post" action="">
-		<?php $list_table->display(); ?>
-	</form>
+    </h2>
+    <form method="post" action="">
+        <?php $list_table->display(); ?>
+    </form>
 </div>
-		<?php
+<?php
 	}
 }
 
@@ -123,7 +123,7 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 		$columns = array(
 			'cb'             => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'id'             => _x( 'id', 'Column label', 'adasdividb' ),
-			'page_id'        => _x( 'page_id', 'Column label', 'adasdividb' ),
+			//'page_id'        => _x( 'page_id', 'Column label', 'adasdividb' ),
 			// 'page_name'      => _x( 'page_name', 'Column label', 'adasdividb' ),
 			'date_submitted' => _x( 'date_submitted', 'Column label', 'adasdividb' ),
 			'read_status'    => _x( 'Read Status', 'Column label', 'adasdividb' ),
