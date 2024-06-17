@@ -34,8 +34,11 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/functions.php';
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-shortcode-request.php';
 
+require_once plugin_dir_path( __FILE__ ) . 'includes/class_kh_woo_db.php';
+
 // Initialize the plugin
 add_action( 'plugins_loaded', array( 'Custom_Quote_Request', 'init' ) );
 
 // Register activation hook to create custom table
-register_activation_hook( __FILE__, array( 'Custom_Quote_Request', 'create_kh_woo_table' ) );
+// se if it works
+register_activation_hook( __FILE__, array( 'KH_Woo_DB', 'create_kh_woo_table' ) );

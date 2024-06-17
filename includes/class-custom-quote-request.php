@@ -35,56 +35,15 @@ class Custom_Quote_Request {
 .single-product .single_add_to_cart_button,
 .single-product button.single_add_to_cart_button,
 .single-product a.single_add_to_cart_button {
-    display: none !important;
+	display: none !important;
 }
 </style>
 
-<?php
+			<?php
 		}
 	}
 
-	public static function create_kh_woo_table() {
-		global $wpdb;
 
-		$table_name = $wpdb->prefix . 'kh_woo';
-
-		// Check if the table already exists
-		$table_name = $wpdb->prefix . 'kh_woo';
-
-		if ( $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'" ) != $table_name ) {
-			$charset_collate = $wpdb->get_charset_collate();
-
-			$sql = "CREATE TABLE $table_name (
-                id mediumint(9) NOT NULL AUTO_INCREMENT,
-                product_id mediumint(9) NOT NULL,
-                product_name text NOT NULL,
-                product_quantity mediumint(9) NULL,
-                product_type text NULL,
-                product_image text NULL,
-                user_email text NOT NULL,
-                phone_number text NULL,
-                variation_id mediumint(9) NULL,
-                variations_attr text NULL,
-                message_quote text NULL,
-                date_submitted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        read_status INT DEFAULT 0,
-        read_date TIMESTAMP NULL,                
-        page_id varchar(255) NOT NULL,
-                PRIMARY KEY (id),
-                KEY product_id (product_id),
-                KEY variation_id (variation_id),
-                KEY date_submitted (date_submitted)
-            ) $charset_collate;";
-
-			require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-			dbDelta( $sql );
-
-			// Check for errors during table creation
-			if ( $wpdb->last_error !== '' ) {
-				error_log( 'Error creating table: ' . $wpdb->last_error );
-			}
-		}
-	}
 
 	public static function enqueue_scripts() {
 		// Ensure jQuery is enqueued
@@ -111,102 +70,6 @@ class Custom_Quote_Request {
 
 
 
-	public static function send_email( $data ) {
-		$message = '<p style="font-size: 16px;">You have requested a quote for the following product:</p>';
-
-		$message .= '<div style="width:90%;margin:0 auto;border: 1px solid #e5e5e5;">';
-		$message .= '<table style="width: 100%;border-collapse: collapse;">';
-		$message .= '<thead>';
-		$message .= '<tr style="border-bottom: 1px solid #e5e5e5;">';
-		$message .= '<th style="width: 16.66%;text-align: center;border-right:1px solid #e5e5e5;padding:10px;">';
-		$message .= __( 'Product Image', AQ );
-		$message .= '</th>';
-		$message .= '<th style="width: 16.66%;text-align: center;border-right:1px solid #e5e5e5;padding:10px;">';
-		$message .= __( 'Product Title', AQ );
-		$message .= '</th>';
-		$message .= '<th style="width: 16.66%;text-align: center;border-right:1px solid #e5e5e5;padding:10px;">';
-		$message .= __( 'Product Variation', AQ );
-		$message .= '</th>';
-		$message .= '<th style="width: 16.66%;text-align: center;border-right:1px solid #e5e5e5;padding:10px;">';
-		$message .= __( 'Product Quantity', AQ );
-		$message .= '</th>';
-		$message .= '<th style="width: 16.66%;text-align: center;padding:10px;">';
-		$message .= __( 'Total', AQ );
-		$message .= '</th>';
-		$message .= '</tr>';
-		$message .= '</thead>';
-		$message .= '<tbody>';
-
-		$quote_post[] = $data;
-
-		$product              = wc_get_product( $quote_post[0]['product_id'] );
-		$product_variation_id = $quote_post[0]['product_id'];
-		$_product             = wc_get_product( $product_variation_id );
-		if ( $_product->is_type( 'simple' ) || $_product->is_type( 'grouped' ) ) {
-			$product_price = $product->get_price();
-		}
-
-		$message        .= '<tr style="border-bottom: 1px solid #e5e5e5;">';
-		$message        .= '<td style="width: 16.66%;padding:10px;text-align: center;border-right:1px solid #e5e5e5;">';
-		$message        .= '<a href="' . $quote_post[0]['product_image'] . '" ><img src="' . $quote_post[0]['product_image'] . '" width="100" /></a>';
-		$message        .= '</td>';
-		$message        .= '<td style="width: 16.66%;padding:10px;text-align: center;border-right:1px solid #e5e5e5;">';
-		$message        .= $quote_post[0]['product_name'];
-		$message        .= ' : <b>' . get_post_meta( $quote_post[0]['variation_id'], 'attribute_size', true ) . '</b>';
-		$message        .= '</td>';
-		$message        .= '<td style="width: 16.66%;padding:10px;text-align: center;border-right:1px solid #e5e5e5;">';
-		$variations_attr = unserialize( $quote_post[0]['variations_attr'] );
-		foreach ( $variations_attr as $attr_name => $attr_value ) {
-			$message .= $attr_name . ': ' . $attr_value . '<br>';
-		}
-		$message   .= '</td>';
-		$message   .= '<td style="width: 16.66%;padding:10px;text-align: center;border-right:1px solid #e5e5e5;">';
-		$message   .= $quote_post[0]['product_quantity'];
-		$message   .= '</td>';
-		$message   .= '<td style="width: 16.66%;padding:10px;text-align: center;">';
-		$message   .= ( $quote_post[0]['product_quantity'] );
-		$message   .= '</td>';
-		$message   .= '</tr>';
-		$product_id = $quote_post[0]['product_id'];
-		$product    = wc_get_product( $product_id );
-		$quantity   = (int) $quote_post[0]['product_quantity'];
-		$sale_price = 200; // $product->get_price();
-
-		$message .= '</tbody>';
-		$message .= '<tfoot>';
-		$message .= '<tr>';
-		$message .= '<td></td>';
-		$message .= '<td></td>';
-		$message .= '<td></td>';
-		$message .= '</tr>';
-		$message .= '</tfoot>';
-		$message .= '</table>';
-		$message .= '</div>';
-
-		$custom_email_message = get_option( 'adas_quote_custom_email_message' );
-		if ( ! empty( $custom_email_message ) ) {
-			$message .= '<p>' . nl2br( esc_html( $custom_email_message ) ) . '</p>';
-		}
-
-		$quote_admin_email = get_option( 'wc_settings_quote_admin_email' );
-		if ( $quote_admin_email != '' ) {
-			$admin_email = $quote_admin_email;
-		} else {
-			$admin_email = get_option( 'admin_email' );
-		}
-		$site_title  = get_bloginfo( 'name' );
-		$admin_email = get_option( 'admin_email' );
-		$to_send     = 'khalidlogi2@gmail.com';
-		$attachments = '';
-
-		$headers           = array( 'Content-Type: text/html; charset=UTF-8', 'From: ' . $site_title . ' <' . $admin_email . '>' );
-		$quote_email_title = 'quote_email_title'; // get_option( 'wc_settings_quote_email_subject' );
-		$email_title       = ( ! empty( $quote_email_title ) ? $quote_email_title : __( 'Quote', AQ ) );
-		if ( wp_mail( $to_send, $email_title, $message, $headers, $attachments ) ) {
-			$message .= '<p>' . __( 'Quote has been sent to', AQ ) . ' ' . str_replace( ',', ', ', $to_send ) . '</p>';
-			wp_mail( $admin_email, __( 'Quote Enquiry', AQ ), $message, $headers, $attachments );
-		}
-	}
 
 
 
@@ -261,7 +124,7 @@ class Custom_Quote_Request {
 			'variations_attr'  => maybe_serialize( $variations_attr ),
 		);
 
-		self::send_email( $data );
+		PluginToolbox::send_email( $data );
 
 		// Check if required data is set
 		if ( ! isset( $_POST['product_id'] ) || ! isset( $_POST['variation_id'] ) ) {
