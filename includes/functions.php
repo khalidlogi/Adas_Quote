@@ -94,10 +94,10 @@ class PluginToolbox {
 
 		$headers           = array( 'Content-Type: text/html; charset=UTF-8', 'From: ' . $site_title . ' <' . $admin_email . '>' );
 		$quote_email_title = 'quote_email_title'; // get_option( 'wc_settings_quote_email_subject' );
-		$email_title       = ( ! empty( $quote_email_title ) ? $quote_email_title : __( 'Quote', AQ ) );
+		$email_title       = ( ! empty( $quote_email_title ) ? $quote_email_title : __( 'Quote', 'AQ' ) );
 		if ( wp_mail( $to_send, $email_title, $message, $headers, $attachments ) ) {
-			$message .= '<p>' . __( 'Quote has been sent to', AQ ) . ' ' . str_replace( ',', ', ', $to_send ) . '</p>';
-			wp_mail( $admin_email, __( 'Quote Enquiry', AQ ), $message, $headers, $attachments );
+			$message .= '<p>' . __( 'Quote has been sent to', 'AQ' ) . ' ' . str_replace( ',', ', ', $to_send ) . '</p>';
+			wp_mail( $admin_email, __( 'Quote Enquiry', 'AQ' ), $message, $headers, $attachments );
 		}
 	}
 
@@ -117,20 +117,7 @@ class PluginToolbox {
 		return $all_categories;
 	}
 
-	/**
-	 * Get the selected categories
-	 *
-	 * @return array
-	 */
-	public static function getAdasQuoteSelectedCategories() {
-		$selected_categories = get_option( 'adas_quote_selected_categories', array() );
 
-		if ( is_string( $selected_categories ) ) {
-			return unserialize( $selected_categories );
-		} else {
-			return $selected_categories;
-		}
-	}
 
 	/**
 	 * Get all category IDs
@@ -142,22 +129,5 @@ class PluginToolbox {
 		$category_ids   = wp_list_pluck( $all_categories, 'term_id' );
 
 		return $category_ids;
-	}
-
-	/**
-	 * Display a list of all categories
-	 */
-	public static function displayAllProductCategories() {
-		$all_categories = self::getAllProductCategories();
-
-		if ( ! empty( $all_categories ) ) {
-			echo '<ul>';
-			foreach ( $all_categories as $category ) {
-				echo '<li>Category ID: ' . $category->term_id . ', Category Name: ' . $category->name . '</li>';
-			}
-			echo '</ul>';
-		} else {
-			echo 'No product categories found.';
-		}
 	}
 }

@@ -54,14 +54,14 @@ class Adas_Quote_Form_Details {
 		$list_table->prepare_items();
 		?>
 <div class="wrap">
-    <h2>Quotes submitted for : <b><?php echo esc_html( $product->get_title() ); ?></b></h2>
+	<h2>Quotes submitted for : <b><?php echo esc_html( $product->get_title() ); ?></b></h2>
 
-    </h2>
-    <form method="post" action="">
-        <?php $list_table->display(); ?>
-    </form>
+	</h2>
+	<form method="post" action="">
+		<?php $list_table->display(); ?>
+	</form>
 </div>
-<?php
+		<?php
 	}
 }
 
@@ -122,11 +122,11 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 	public function get_columns() {
 		$columns = array(
 			'cb'             => '<input type="checkbox" />', // Render a checkbox instead of text.
-			'id'             => _x( 'id', 'Column label', 'adasdividb' ),
-			//'page_id'        => _x( 'page_id', 'Column label', 'adasdividb' ),
-			// 'page_name'      => _x( 'page_name', 'Column label', 'adasdividb' ),
-			'date_submitted' => _x( 'date_submitted', 'Column label', 'adasdividb' ),
-			'read_status'    => _x( 'Read Status', 'Column label', 'adasdividb' ),
+			'id'             => _x( 'id', 'Column label', 'AQ' ),
+			// 'page_id'        => _x( 'page_id', 'Column label', 'AQ' ),
+			// 'page_name'      => _x( 'page_name', 'Column label', 'AQ' ),
+			'date_submitted' => _x( 'date_submitted', 'Column label', 'AQ' ),
+			'read_status'    => _x( 'Read Status', 'Column label', 'AQ' ),
 		);
 
 		return $columns;
@@ -217,7 +217,7 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 			'<a href="%1$s&view_nonce=%2$s">%3$s</a>',
 			esc_url( add_query_arg( $view_query_args, 'admin.php' ) ),
 			esc_attr( $view_nonce ),
-			_x( 'Details', 'List table row action', 'adasdividb' )
+			_x( 'Details', 'List table row action', 'AQ' )
 		);
 
 		// Return the page_id contents.

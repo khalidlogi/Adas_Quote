@@ -11,8 +11,8 @@ add_action( 'admin_menu', 'adas_add_menu_items' );
  */
 function adas_add_menu_items() {
 	add_menu_page(
-		__( 'Adas Quote form DB List', 'adasdividb' ), // Page title.
-		__( 'Adas Quotes Manager', 'adasdividb' ),        // Menu title.
+		__( 'Adas Quote form DB List', 'AQ' ), // Page title.
+		__( 'Adas Quotes Manager', 'AQ' ),        // Menu title.
 		'activate_plugins',                                         // Capability.
 		'adas_list',                                             // Menu slug.
 		'adas_quote_render_list_page',                                       // Callback function.
@@ -102,9 +102,9 @@ class Adas_Main_List_Table extends WP_List_Table {
 	public function get_columns() {
 
 		$columns = array(
-			'product_id'   => __( 'PRODUCT ID', 'adasdividb' ),
+			'product_id'   => __( 'PRODUCT ID', 'AQ' ),
 			'product_name' => 'Product Name',
-			'count'        => __( 'Count', 'adasdividb' ),
+			'count'        => __( 'Count', 'AQ' ),
 		);
 
 		return $columns;

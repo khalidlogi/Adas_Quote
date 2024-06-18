@@ -15,7 +15,8 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<a href="<?php echo admin_url( 'admin.php?page=adas_list' ); ?>" class="btn btn-primary">Manage quotes
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=adas_list' ) ); ?>" class="btn btn-primary">Manage
+					quotes
 				</a>
 			</div>
 		</div>

@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: Custom Variation Alert
- * Description: Display an alert when a WooCommerce product variation is changed.
+ * Plugin Name: Adas Quote for WC
+ * Description: Display Quote for quotes.
  * Version: 1.0.0
  * Author: Your Name
  * Text Domain: custom-variation-alert
@@ -32,7 +32,7 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-custom-quote-request_
 // Include the functions.php file
 require_once plugin_dir_path( __FILE__ ) . 'includes/functions.php';
 
-require_once plugin_dir_path( __FILE__ ) . 'includes/class-shortcode-request.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-quote_button_form.php';
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/class_kh_woo_db.php';
 
