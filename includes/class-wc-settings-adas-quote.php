@@ -1,10 +1,14 @@
 <?php
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit; // Exit if accessed directly.
 }
+
 add_action( 'admin_menu', 'adas_quote_settings_menu' );
 
+/**
+ * Add options page to the admin menu.
+ */
 function adas_quote_settings_menu() {
 	add_options_page(
 		'ADAS Quote Settings',
@@ -17,36 +21,16 @@ function adas_quote_settings_menu() {
 
 add_action( 'admin_init', 'adas_quote_settings_init' );
 
-// add_action( 'admin_init', 'adas_quote_handle_clear_settings' );
-
-// function adas_quote_handle_clear_settings() {
-// if ( isset( $_POST['adas_quote_clear_settings'] ) && $_POST['adas_quote_clear_settings'] == '1' ) {
-// delete_option( 'adas_quote_hide_add_to_cart' );
-// delete_option( 'adas_quote_hide_price' );
-// delete_option( 'adas_quote_custom_email_message' );
-// delete_option( 'adas_quote_admin_email' );
-// delete_option( 'adas_quote_selected_products' );
-// delete_option( 'adas_quote_selected_categories' );
-// }
-// }
+/**
+ * Initialize settings.
+ */
 function adas_quote_settings_init() {
-
-	// a:3:{i:0;s:2:"38";i:1;s:8:"36,37,38";i:2;s:2:"37";}
 	register_setting( 'adas_quote_settings_group', 'adas_quote_hide_add_to_cart' );
 	register_setting( 'adas_quote_settings_group', 'adas_quote_hide_price' );
 	register_setting( 'adas_quote_settings_group', 'adas_quote_custom_email_message' );
 	register_setting( 'adas_quote_settings_group', 'adas_quote_admin_email' );
 	register_setting( 'adas_quote_settings_group', 'adas_quote_selected_products' );
 	register_setting( 'adas_quote_settings_group', 'adas_quote_selected_categories' );
-	// register_setting( 'adas_quote_settings_group', 'adas_quote_display_categories' );
-
-	// add_settings_field(
-	// 'adas_quote_display_categories',
-	// 'Display All Categories',
-	// 'adas_quote_display_categories_callback',
-	// 'adas-quote-settings',
-	// 'adas_quote_settings_section'
-	// );
 
 	add_settings_section(
 		'adas_quote_settings_section',
@@ -55,7 +39,6 @@ function adas_quote_settings_init() {
 		'adas-quote-settings'
 	);
 
-	// Add settings field for selecting categories
 	add_settings_field(
 		'adas_quote_selected_categories',
 		'Select Categories for Quote Button',
@@ -71,6 +54,7 @@ function adas_quote_settings_init() {
 		'adas-quote-settings',
 		'adas_quote_settings_section'
 	);
+
 	add_settings_field(
 		'adas_quote_hide_price',
 		'Hide Price',
@@ -104,36 +88,14 @@ function adas_quote_settings_init() {
 	);
 }
 
-// function adas_quote_display_categories_callback() {
-// $selected_products = get_option( 'adas_quote_selected_products', array() );
-
-// PluginToolbox::displayAllProductCategories();
-// $cat = PluginToolbox::getAdasQuoteSelectedCategories();
-// print_r( $cat );
-// echo '<br>';
-// echo 'selected_products: ';
-// print_r( $selected_products );
-// }
 /**
  * Callback function for displaying the selected product categories in a multi-select dropdown.
- *
- * This function retrieves the selected product categories from the WordPress options, and then displays a multi-select dropdown
- * with all the available product categories. The selected categories are pre-selected in the dropdown.
- *
- * The function also handles the case where a category has child categories. In such cases, the child category IDs are added to the
- * selected categories array to ensure that the child categories are also selected.
- *
- * @return void
  */
 function adas_quote_selected_categories_callback() {
 	global $wp_query;
 
-	// Get the current product category from the query
 	$current_product_cat = isset( $wp_query->query['product_cat'] ) ? $wp_query->query['product_cat'] : '';
-	error_log( '$current_product_cat: ' . print_r( $current_product_cat, true ) );
-	error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
 
-	// Default arguments for get_terms
 	$defaults = array(
 		'pad_counts'         => 1,
 		'show_count'         => 1,
@@ -145,90 +107,35 @@ function adas_quote_selected_categories_callback() {
 		'menu_order'         => false,
 	);
 
-	// Parse arguments and get terms
 	$args  = wp_parse_args( array(), $defaults );
 	$terms = get_terms( array_merge( array( 'taxonomy' => 'product_cat' ), $args ) );
 
 	$saved_product_cat = get_option( 'adas_quote_selected_categories', '' );
 
-	// Start building the output for the dropdown
 	$output  = "<select name='adas_quote_selected_categories' class='dropdown_product_cat'>";
 	$output .= '<option value="" ' . selected( $saved_product_cat, '', false ) . '>' . __( 'Select a category', 'woocommerce' ) . '</option>';
 	$output .= wc_walk_category_dropdown_tree( $terms, 0, array_merge( $args, array( 'selected' => $saved_product_cat ) ) );
 
-	$output .= '</select>';
-	// Echo the output
-	echo $output;
-}
-
-	// Retrieve the selected product categories from the WordPress options
-
-	/*
-	$selected_categories        = get_option( 'adas_quote_selected_categories', array() );
-	$selected_categories_explod = explode( ',', $selected_categories[0] );
-	error_log( '$selected_categories_explod: ' . print_r( $selected_categories_explod, true ) );
-	error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
-	error_log( '$selected_categories: ' . print_r( $selected_categories, true ) );
-	error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
-
-	// Retrieve all the product categories
-	$categories = get_terms(
-		array(
-			'taxonomy'   => 'product_cat',
-			'hide_empty' => false,
-		)
+	$output      .= '</select>';
+	$allowed_html = array(
+		'select' => array(
+			'name'  => true,
+			'class' => true,
+		),
+		'option' => array(
+			'value'    => true,
+			'selected' => true,
+		),
 	);
+	echo wp_kses( $output, $allowed_html );}
 
-	// Debug output for the selected categories
-	echo 'selected_categories';
-	print_r( $selected_categories );
-
-	// Start the multi-select dropdown
-	echo '<select multiple name="adas_quote_selected_categories[]" style="width: 300px;">';
-
-	// Loop through the product categories and display them in the dropdown
-	foreach ( $categories as $category ) {
-
-		// Check if the category has children
-		$children = get_term_children( $category->term_id, 'product_cat' );
-		if ( ! empty( $children ) ) {
-			// Add the child category IDs to the selected categories
-			$selected_categories = array_merge( $selected_categories, $children );
-			// error_log( '$children : ' . print_r( $children, true ) );
-			// error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
-		}
-
-		// Check if the current category is selected
-		$selected = in_array( $category->term_id, explode( ',', $selected_categories[0] ) ) ? 'selected' : '';
-
-			// Combine the category ID and its children IDs into a comma-separated string
-			$ids = array( $category->term_id );
-		if ( ! empty( $children ) ) {
-			$ids = array_merge( $ids, $children );
-		}
-
-			error_log( '$ids: ' . print_r( $ids, true ) );
-
-		$ids = $ids;// implode( ',', $ids );
-
-		// Display the category in the dropdown, with the selected status
-		echo '<option value="' . esc_attr( $ids ) . '" ' . esc_attr( $selected ) . '>' . esc_html( $category->name ) . ' id: ' . esc_html( ( $category->term_id ) ) . '</option>';
-
-		// Debug output for the category ID
-		error_log( '$category->term_id: ' . print_r( $category->term_id, true ) );
-		error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
-
-		*/
-
-
-	// Close the multi-select dropdown
-
-
-
+/**
+ * Callback function for displaying the selected products in a multi-select dropdown.
+ */
 function adas_quote_selected_products_callback() {
 	$selected_products = get_option( 'adas_quote_selected_products', array() );
 	$paged             = isset( $_REQUEST['paged'] ) ? absint( $_REQUEST['paged'] ) : 1;
-	$per_page          = 50; // Number of products to display per page
+	$per_page          = 50;
 	$products          = wc_get_products(
 		array(
 			'limit'   => $per_page,
@@ -240,14 +147,14 @@ function adas_quote_selected_products_callback() {
 	);
 
 	if ( ! $products ) {
-		_e( 'No products found.', 'text-domain' );
+		esc_html__( 'No products found.', 'AQ' );
 		return;
 	}
 
 	echo '<select multiple name="adas_quote_selected_products[]" style="width: 300px;">';
 	foreach ( $products as $product ) {
 		$selected = in_array( $product->get_id(), $selected_products ) ? 'selected' : '';
-		echo '<option value="' . esc_attr( $product->get_id() ) . '" ' . $selected . '>' . esc_html( $product->get_name() ) . '</option>';
+		echo '<option value="' . esc_attr( $product->get_id() ) . '" ' . esc_attr( $selected ) . '>' . esc_html( $product->get_name() ) . '</option>';
 	}
 	echo '</select>';
 
@@ -260,7 +167,14 @@ function adas_quote_selected_products_callback() {
 	);
 	$total_pages    = ceil( count( $total_products ) / $per_page );
 
-	echo '<span class="displaying-num">' . sprintf( _n( '1 product', '%s products', count( $total_products ), 'text-domain' ), count( $total_products ) ) . '</span>';
+	echo '<span class="displaying-num">' . esc_html(
+		sprintf(
+		// Translators: 1: Number of products.
+			    // phpcs:ignore WordPress.WP.I18n
+			_n( '1 product', '%s products', count( $total_products ), 'AQ' ),
+			count( $total_products )
+		)
+	) . '</span>';
 
 	$pagination_args = array(
 		'base'      => add_query_arg( 'paged', '%#%' ),
@@ -271,26 +185,12 @@ function adas_quote_selected_products_callback() {
 		'current'   => $paged,
 	);
 
-	echo '<span class="pagination-links">' . paginate_links( $pagination_args ) . '</span>';
+	echo '<span class="pagination-links">' . esc_html( paginate_links( $pagination_args ) ) . '</span>';
 }
 
-// function adas_quote_selected_categories_callback() {
-// $selected_categories = get_option( 'adas_quote_selected_categories', array() );
-// $categories          = get_terms(
-// array(
-// 'taxonomy'   => 'product_cat',
-// 'hide_empty' => false,
-// )
-// );
-
-// echo '<select multiple name="adas_quote_selected_categories[]" style="width: 300px;">';
-// foreach ( $categories as $category ) {
-// $selected = in_array( $category->term_id, $selected_categories ) ? 'selected' : '';
-// echo '<option value="' . esc_attr( $category->term_id ) . '" ' . $selected . '>' . esc_html( $category->name ) . '</option>';
-// }
-// echo '</select>';
-// }
-
+/**
+ * Callback function for displaying the admin email input field.
+ */
 function adas_quote_admin_email_callback() {
 	$option = get_option( 'adas_quote_admin_email' );
 	if ( empty( $option ) ) {
@@ -299,41 +199,51 @@ function adas_quote_admin_email_callback() {
 	echo '<input style="width: 300px;" type="email" name="adas_quote_admin_email" value="' . esc_attr( $option ) . '">';
 }
 
+/**
+ * Callback function for displaying the custom email message textarea.
+ */
 function adas_quote_custom_email_message_callback() {
 	$option = get_option( 'adas_quote_custom_email_message' );
 	echo '<textarea name="adas_quote_custom_email_message" rows="5" cols="50">' . esc_textarea( $option ) . '</textarea>';
 }
 
+/**
+ * Callback function for displaying the hide price checkbox.
+ */
 function adas_quote_show_price_callback() {
 	$option = get_option( 'adas_quote_hide_price' );
 	echo '<input type="checkbox" name="adas_quote_hide_price" value="1" ' . checked( 1, $option, false ) . '>';
 }
 
+/**
+ * Callback function for displaying the settings section description.
+ */
 function adas_quote_settings_section_callback() {
 	echo 'Configure the ADAS Quote settings below:';
 }
 
+/**
+ * Callback function for displaying the hide add to cart checkbox.
+ */
 function adas_quote_hide_add_to_cart_callback() {
 	$option = get_option( 'adas_quote_hide_add_to_cart' );
 	echo '<input type="checkbox" name="adas_quote_hide_add_to_cart" value="1" ' . checked( 1, $option, false ) . '>';
 }
 
+/**
+ * Display the settings page.
+ */
 function adas_quote_settings_page() {
 	?>
-
 <div class="wrap custom-quote-settings-page">
-
-	<div class="wrap">
-		<h1>ADAS Quote Settings</h1>
-		<form method="post" action="options.php">
-			<?php
+	<h1>ADAS Quote Settings</h1>
+	<form method="post" action="options.php">
+		<?php
 			settings_fields( 'adas_quote_settings_group' );
 			do_settings_sections( 'adas-quote-settings' );
 			submit_button();
-			?>
-
-		</form>
-	</div>
+		?>
+	</form>
 </div>
 	<?php
 }

@@ -76,47 +76,40 @@ class Custom_Quote_Request {
 	public static function handle_quote_request() {
 		global $wpdb;
 
-		$nonce = sanitize_text_field( $_POST['custom_quote_request_nonce'] );
-
-		if ( ! wp_verify_nonce( $nonce, 'adas_quote_action' ) ) {
-			wp_die( 'nonce not verified' );
+		// Verify nonce.
+		$nonce = isset( $_POST['custom_quote_request_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['custom_quote_request_nonce'] ) ) : '';
+		if ( empty( $nonce ) || ! wp_verify_nonce( $nonce, 'adas_quote_action' ) ) {
+			wp_send_json_error( 'Nonce not verified', 403 );
+			wp_die();
 		}
 
-			// Get data from AJAX request
+		// Sanitize and validate inputs.
+		$product_id       = isset( $_POST['product_id'] ) ? sanitize_text_field( wp_unslash( $_POST['product_id'] ) ) : '';
+		$product_name     = isset( $_POST['product_name'] ) ? sanitize_text_field( stripslashes( wp_unslash( $_POST['product_name'] ) ) ) : '';
+		$product_quantity = isset( $_POST['product_quantity'] ) ? sanitize_text_field( wp_unslash( $_POST['product_quantity'] ) ) : '';
+		$useremail        = isset( $_POST['useremail'] ) ? sanitize_email( wp_unslash( $_POST['useremail'] ) ) : '';
+		$phone_number     = isset( $_POST['phone_number'] ) ? sanitize_text_field( wp_unslash( $_POST['phone_number'] ) ) : '';
+		$product_type     = isset( $_POST['product_type'] ) ? sanitize_text_field( wp_unslash( $_POST['product_type'] ) ) : '';
+		$product_image    = isset( $_POST['product_image'] ) ? esc_url_raw( wp_unslash( $_POST['product_image'] ) ) : '';
+		$variation_id     = isset( $_POST['variation_id'] ) ? sanitize_text_field( wp_unslash( $_POST['variation_id'] ) ) : '';
+		$message_quote    = isset( $_POST['message_quote'] ) ? sanitize_text_field( wp_unslash( $_POST['message_quote'] ) ) : '';
+		$variations_attr  = isset( $_POST['variations_attr'] ) ? json_decode( stripslashes( wp_unslash( $_POST['variations_attr'] ) ), true ) : array();
 
-		$product_id = sanitize_text_field( $_POST['product_id'] );
-		error_log( 'handle_quote_request $product_id: ' . print_r( $product_id, true ) );
-		error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
-		$product_name     = sanitize_text_field( stripslashes( $_POST['product_name'] ) );
-		$product_quantity = sanitize_text_field( $_POST['product_quantity'] );
-		$useremail        = sanitize_text_field( $_POST['useremail'] );
-		$phone_number     = sanitize_text_field( $_POST['phone_number'] );
-		error_log( '$phone_number : ' . print_r( $phone_number, true ) );
-		error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
-		$product_type  = sanitize_text_field( $_POST['product_type'] );
-		$product_image = sanitize_text_field( $_POST['product_image'] );
-		$variation_id  = sanitize_text_field( $_POST['variation_id'] );
-		// $current_url      = $_POST['current_url'];
-			// Get the current page ID
-		// $id      = self::get_current_page_id();
-		$page_id = get_permalink( $id );
-			error_log( '$page_url: ' . print_r( $page_id, true ) );
-			error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
+		// Validate required fields.
+		if ( empty( $product_id ) || empty( $variation_id ) || empty( $useremail ) ) {
+			wp_send_json_error( 'Missing required data', 400 );
+			wp_die();
+		}
 
-		$date_submitted = current_time( 'mysql' );
-
-		$message_quote   = sanitize_text_field( $_POST['message_quote'] );
-		$variations_attr = json_decode( stripslashes( $_POST['variations_attr'] ), true );
-
-		// Prepare data for database insertion
+		// Prepare data for database insertion.
 		$data = array(
 			'product_id'       => $product_id,
 			'product_name'     => $product_name,
 			'product_quantity' => $product_quantity,
 			'user_email'       => $useremail,
 			'phone_number'     => $phone_number,
-			'date_submitted'   => $date_submitted,
-			'page_id'          => get_permalink( $product_id ), // Get the permalink of the current page
+			'date_submitted'   => current_time( 'mysql' ),
+			'page_id'          => get_permalink( $product_id ),
 			'product_type'     => $product_type,
 			'product_image'    => $product_image,
 			'variation_id'     => $variation_id,
@@ -124,16 +117,13 @@ class Custom_Quote_Request {
 			'variations_attr'  => maybe_serialize( $variations_attr ),
 		);
 
+		// Send email
 		PluginToolbox::send_email( $data );
 
-		// Check if required data is set
-		if ( ! isset( $_POST['product_id'] ) || ! isset( $_POST['variation_id'] ) ) {
-			wp_send_json_error( 'Missing required data' );
-		}
-
-		// Insert data into 'kh_woo' table
+		// Insert data into 'kh_woo' table.
 		$wpdb->insert( $wpdb->prefix . 'kh_woo', $data );
 
+		// Send success response.
 		$response = array(
 			'success' => true,
 			'message' => 'Quote request received successfully!',
