@@ -134,7 +134,7 @@ function adas_quote_selected_categories_callback() {
  */
 function adas_quote_selected_products_callback() {
 	$selected_products = get_option( 'adas_quote_selected_products', array() );
-	$paged             = isset( $_REQUEST['paged'] ) ? absint( $_REQUEST['paged'] ) : 1;
+	$paged             = isset( $_REQUEST['paged'] ) ? absint( $_REQUEST['paged'] ) : 1;//phpcs:ignore WordPress.Security.NonceVerification
 	$per_page          = 50;
 	$products          = wc_get_products(
 		array(
