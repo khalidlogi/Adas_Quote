@@ -54,13 +54,13 @@ class Adas_Quote_Form_Details {
 		$list_table->prepare_items();
 		?>
 <div class="wrap">
-    <h2>Quotes submitted for : <b><?php echo esc_html( $product->get_title() ); ?></b></h2>
-    <?php $list_table->display(); ?>
-    <div class="tablenav bottom">
-        <?php echo wp_kses_post( $list_table->get_views() ); // Display pagination links. ?>
-    </div>
+	<h2>Quotes submitted for : <b><?php echo esc_html( $product->get_title() ); ?></b></h2>
+		<?php $list_table->display(); ?>
+	<div class="tablenav bottom">
+		<?php echo wp_kses_post( $list_table->get_views() ); // Display pagination links. ?>
+	</div>
 </div>
-<?php
+		<?php
 	}
 }
 

@@ -1,5 +1,10 @@
 <?php
-class Custom_Bootstrap_Enqueue {
+/**
+ * Class Custom_Bootstrap_Enqueue
+ *
+ * Handles the enqueuing of scripts and styles for both the front-end and admin pages.
+ */
+class Custom_Enqueue {
 	/**
 	 * Initialize the class by setting up the necessary actions.
 	 */
@@ -12,7 +17,7 @@ class Custom_Bootstrap_Enqueue {
 	 * Enqueue custom CSS for the admin settings page.
 	 */
 	public static function adas_quote_admin_styles() {
-		wp_enqueue_style( 'adas-quote-admin-styles', plugin_dir_url( __FILE__ ) . '../css/admin-styles.css' );
+		wp_enqueue_style( 'adas-quote-admin-styles', plugin_dir_url( __FILE__ ) . '../css/admin-styles.css', array(), '1.0.0' );
 	}
 
 	/**
@@ -22,18 +27,20 @@ class Custom_Bootstrap_Enqueue {
 		// Ensure jQuery is enqueued
 		wp_enqueue_script( 'jquery' );
 
-		// Enqueue Bootstrap CSS
-		wp_enqueue_style( 'bootstrap-css', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css' );
+		// Enqueue Bootstrap CSS.
+		wp_enqueue_style( 'bootstrap-css', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css', array(), '4.5.2' );
 
-		// Enqueue custom CSS
+		// Enqueue custom CSS.
 		wp_enqueue_style(
 			'custom-quote-style',
-			plugin_dir_url( __FILE__ ) . '../css/custom-quote.css'
+			plugin_dir_url( __FILE__ ) . '../css/custom-quote.css',
+			array(),
+			'1.0.0'
 		);
 
-		// Enqueue Bootstrap JS
-		wp_enqueue_script( 'bootstrap-js', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js', array( 'jquery' ), null, true );
+		// Enqueue Bootstrap JS.
+		wp_enqueue_script( 'bootstrap-js', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js', array( 'jquery' ), '4.5.2', true );
 	}
 }
 
-Custom_Bootstrap_Enqueue::init();
+Custom_Enqueue::init();
