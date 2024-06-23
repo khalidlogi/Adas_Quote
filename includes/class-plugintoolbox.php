@@ -181,13 +181,11 @@ class PluginToolbox {
 
 	public static function send_email( $data ) {
 		if ( ! is_array( $data ) || empty( $data ) ) {
-			error_log( 'Invalid data provided to send_email function' );
 			return false;
 		}
 
 		$product = wc_get_product( $data['product_id'] );
 		if ( ! $product ) {
-			error_log( 'Invalid product ID provided to send_email function' );
 			return false;
 		}
 
@@ -213,71 +211,11 @@ class PluginToolbox {
 			wp_mail( $admin_email, __( 'Quote Enquiry', 'AQ' ), $admin_message, $headers );
 			return true;
 		} else {
-			error_log( sprintf( 'Failed to send quote email to %s', $to_send ) );
 			return false;
 		}
 	}
 
-	/*
-		private static function generate_email_body( $data, $product ) {
-		ob_start();
-		?>
-	<p style="font-size: 16px;"><?php esc_html_e( 'You have requested a quote for the following product:', 'AQ' ); ?></p>
-	<div style="width:90%;margin:0 auto;border: 1px solid #e5e5e5;">
-	<table style="width: 100%;border-collapse: collapse;">
-		<thead>
-			<tr style="border-bottom: 1px solid #e5e5e5;">
-				<th style="width: 20%;text-align: center;border-right:1px solid #e5e5e5;padding:10px;">
-					<?php esc_html_e( 'Product Image', 'AQ' ); ?></th>
-				<th style="width: 20%;text-align: center;border-right:1px solid #e5e5e5;padding:10px;">
-					<?php esc_html_e( 'Product Title', 'AQ' ); ?></th>
-				<th style="width: 20%;text-align: center;border-right:1px solid #e5e5e5;padding:10px;">
-					<?php esc_html_e( 'Product Variation', 'AQ' ); ?></th>
-				<th style="width: 20%;text-align: center;border-right:1px solid #e5e5e5;padding:10px;">
-					<?php esc_html_e( 'Product Quantity', 'AQ' ); ?></th>
-				<th style="width: 20%;text-align: center;padding:10px;"><?php esc_html_e( 'Total', 'AQ' ); ?></th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr style="border-bottom: 1px solid #e5e5e5;">
-				<td style="width: 20%;padding:10px;text-align: center;border-right:1px solid #e5e5e5;">
-					<img src="<?php echo esc_url( $data['product_image'] ); ?>" width="100"
-						alt="<?php echo esc_attr( $data['product_name'] ); ?>" />
-				</td>
-				<td style="width: 20%;padding:10px;text-align: center;border-right:1px solid #e5e5e5;">
-					<?php echo esc_html( $data['product_name'] ); ?>
-					<?php if ( ! empty( $data['variation_id'] ) ) : ?>
-					: <b><?php echo esc_html( get_post_meta( $data['variation_id'], 'attribute_size', true ) ); ?></b>
-					<?php endif; ?>
-				</td>
-				<td style="width: 20%;padding:10px;text-align: center;border-right:1px solid #e5e5e5;">
-					<?php
-							$variations_attr = maybe_unserialize( $data['variations_attr'] );
-					if ( is_array( $variations_attr ) ) {
-						foreach ( $variations_attr as $attr_name => $attr_value ) {
-							echo esc_html( $attr_name ) . ': ' . esc_html( $attr_value ) . '<br>';
-						}
-					}
-					?>
-				</td>
-				<td style="width: 20%;padding:10px;text-align: center;border-right:1px solid #e5e5e5;">
-					<?php echo esc_html( $data['product_quantity'] ); ?>
-				</td>
-				<td style="width: 20%;padding:10px;text-align: center;">
-					<?php echo esc_html( $data['product_quantity'] ); ?>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-	</div>
-	<?php
-		$custom_email_message = get_option( 'adas_quote_custom_email_message' );
-		if ( ! empty( $custom_email_message ) ) {
-			echo '<p>' . nl2br( esc_html( $custom_email_message ) ) . '</p>';
-		}
 
-		return ob_get_clean();
-	}*/
 
 	private static function generate_email_body( $data, $product ) {
 		ob_start();

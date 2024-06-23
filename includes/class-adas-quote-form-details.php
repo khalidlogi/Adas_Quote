@@ -1,7 +1,8 @@
 <?php
-
 /**
  * Adas Admin subpage
+ *
+ * @package AdasQuoteForWC
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -53,13 +54,13 @@ class Adas_Quote_Form_Details {
 		$list_table->prepare_items();
 		?>
 <div class="wrap">
-	<h2>Quotes submitted for : <b><?php echo esc_html( $product->get_title() ); ?></b></h2>
-		<?php $list_table->display(); ?>
-	<div class="tablenav bottom">
-		<?php echo $list_table->get_views(); // Display pagination links ?>
-	</div>
+    <h2>Quotes submitted for : <b><?php echo esc_html( $product->get_title() ); ?></b></h2>
+    <?php $list_table->display(); ?>
+    <div class="tablenav bottom">
+        <?php echo wp_kses_post( $list_table->get_views() ); // Display pagination links. ?>
+    </div>
 </div>
-		<?php
+<?php
 	}
 }
 
@@ -160,7 +161,7 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 			case 'date_submitted':
 				return $item[ $column_name ];
 			default:
-				return print_r( $item, true ); // Show the whole array for troubleshooting purposes.
+				// return print_r( $item, true ); // Show the whole array for troubleshooting purposes.
 		}
 	}
 
@@ -298,12 +299,18 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 		);
 	}
 
+	/**
+	 * Get the pagination views for the list table.
+	 *
+	 * @return string HTML output for the pagination views.
+	 */
 	public function get_views() {
 		$current_page = $this->get_pagenum();
 		$total_items  = $this->_pagination_args['total_items'];
 		$total_pages  = ceil( $total_items / $this->_pagination_args['per_page'] );
 
-		$output  = '<div class="tablenav-pages">';
+		$output = '<div class="tablenav-pages">';
+		// translators: %s: Number of items.
 		$output .= sprintf(
 			'<span class="displaying-num">' . _n( '%s item', '%s items', $total_items ) . '</span>',
 			number_format_i18n( $total_items )
@@ -331,6 +338,13 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 		return $output;
 	}
 
+	/**
+	 * Custom sorting function for the list table.
+	 *
+	 * @param array $a First item to compare.
+	 * @param array $b Second item to compare.
+	 * @return int Comparison result.
+	 */
 	protected function usort_reorder( $a, $b ) {
         // phpcs:disable WordPress.Security.NonceVerification
 		$orderby = ( ! empty( $_GET['orderby'] ) ) ? sanitize_text_field( wp_unslash( $_GET['orderby'] ) ) : 'read_status';
@@ -350,27 +364,52 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 				return 0; // Return 0 for no sorting.
 		}
 
-		return ( $order === 'asc' ) ? $result : -$result;
+		return ( 'asc' === $order ) ? $result : -$result;
 	}
 
+	/**
+	 * Retrieve the entries data for the list table.
+	 *
+	 * @param int $page The current page number.
+	 * @param int $items_per_page The number of items to display per page.
+	 * @return array The entries data.
+	 */
 	public function entries_data( $page, $items_per_page ) {
 		global $wpdb;
-		$offset = ( $page - 1 ) * $items_per_page;
 
-		$orderby = isset( $_GET['orderby'] ) ? sanitize_sql_orderby( $_GET['orderby'] ) : 'date_submitted';
-		$order   = isset( $_GET['order'] ) && strtolower( $_GET['order'] ) === 'asc' ? 'ASC' : 'DESC';
+		// Sanitize input parameters
+		$page           = absint( $page );
+		$items_per_page = absint( $items_per_page );
+		$offset         = ( $page - 1 ) * $items_per_page;
 
-		$product_id = $this->product_id;
-        // phpcs:ignore WordPress.DB
-		$results = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->prefix}kh_woo WHERE product_id = %s ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d",
-				$product_id,
-				$items_per_page,
-				$offset
-			),
-			ARRAY_A
+		// Sanitize and validate orderby
+		$valid_orderby_columns = array( 'date_submitted', 'id', 'product_id' ); // Add all valid column names
+		$orderby               = isset( $_GET['orderby'] ) && in_array( $_GET['orderby'], $valid_orderby_columns )
+			? sanitize_sql_orderby( wp_unslash( $_GET['orderby'] ) )
+			: 'date_submitted';
+
+		// Sanitize and validate order.
+		$order = isset( $_GET['order'] ) && strtolower( sanitize_text_field( wp_unslash( $_GET['order'] ) ) ) === 'asc'
+			? 'ASC'
+			: 'DESC';
+
+		$product_id = absint( $this->product_id );
+
+		// Prepare the query.
+		$query = $wpdb->prepare(
+			"SELECT * FROM {$wpdb->prefix}kh_woo 
+            WHERE product_id = %d 
+            ORDER BY {$orderby} {$order} 
+            LIMIT %d OFFSET %d",
+			$product_id,
+			$items_per_page,
+			$offset
 		);
+
+		// Execute the query.
+        // phpcs:ignore.
+		$results = $wpdb->get_results( $query, ARRAY_A );
+
 		return $results;
 	}
 }
