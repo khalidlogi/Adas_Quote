@@ -4,18 +4,14 @@
  * Adas Admin subpage
  */
 
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-
 
 /**
  * Class Adas_Quote_Form_Details
  */
 class Adas_Quote_Form_Details {
-
 
 	/**
 	 * Form ID
@@ -23,8 +19,8 @@ class Adas_Quote_Form_Details {
 	 * @var string
 	 */
 	private $product_id;
+
 	/**
-	 *
 	 * Constructor start subpage
 	 */
 	public function __construct() {
@@ -36,10 +32,10 @@ class Adas_Quote_Form_Details {
 			wp_die( 'No action taken' );
 		}
 
-			$this->product_id = isset( $_GET['fid'] ) ? sanitize_text_field( wp_unslash( $_GET['fid'] ) ) : '';
+		$this->product_id = isset( $_GET['fid'] ) ? sanitize_text_field( wp_unslash( $_GET['fid'] ) ) : '';
 
-			// create page.
-			$this->adas_table_page();
+		// create page.
+		$this->adas_table_page();
 	}
 
 	/**
@@ -49,17 +45,19 @@ class Adas_Quote_Form_Details {
 	 */
 	public function adas_table_page() {
 		$product = wc_get_product( $this->product_id );
+		if ( ! $product ) {
+			wp_die( 'Product not found.' );
+		}
 
 		$list_table = new ADASQT_Wp_Sub_Page();
 		$list_table->prepare_items();
 		?>
 <div class="wrap">
 	<h2>Quotes submitted for : <b><?php echo esc_html( $product->get_title() ); ?></b></h2>
-
-	</h2>
-	<form method="post" action="">
 		<?php $list_table->display(); ?>
-	</form>
+	<div class="tablenav bottom">
+		<?php echo $list_table->get_views(); // Display pagination links ?>
+	</div>
 </div>
 		<?php
 	}
@@ -69,6 +67,7 @@ class Adas_Quote_Form_Details {
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
+
 /**
  * WPFormsDB_Wp_List_Table class will create the page to load the table.
  */
@@ -80,6 +79,7 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 	 * @var string
 	 */
 	private $product_id;
+
 	/**
 	 * Page number.
 	 *
@@ -91,7 +91,6 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 	 * Constructor start subpage
 	 */
 	public function __construct() {
-
 		$nonce = isset( $_REQUEST['adas_list_nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['adas_list_nonce'] ) ) : '';
 
 		if ( wp_verify_nonce( $nonce, 'adas_list_nonce' ) ) {
@@ -111,7 +110,6 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 		);
 	}
 
-
 	/**
 	 * Get a list of columns. The format is:
 	 * 'internal-name' => 'page_id'
@@ -123,15 +121,12 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 		$columns = array(
 			'cb'             => '<input type="checkbox" />', // Render a checkbox instead of text.
 			'id'             => _x( 'id', 'Column label', 'AQ' ),
-			// 'page_id'        => _x( 'page_id', 'Column label', 'AQ' ),
-			// 'page_name'      => _x( 'page_name', 'Column label', 'AQ' ),
-			'date_submitted' => _x( 'date_submitted', 'Column label', 'AQ' ),
+			'date_submitted' => _x( 'Date', 'Column label', 'AQ' ),
 			'read_status'    => _x( 'Read Status', 'Column label', 'AQ' ),
 		);
 
 		return $columns;
 	}
-
 
 	/**
 	 * Get a list of sortable columns.
@@ -151,33 +146,21 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 	/**
 	 * Get default column value.
 	 *
-	 * For more detailed insight into how columns are handled, take a look at
-	 * WP_List_Table::single_row_columns()
-	 *
 	 * @param object $item        A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 * @return string Text or HTML to be placed inside the column <td>.
 	 */
-
-	/**
-	 * Get the table columns.
-	 */
 	protected function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
-
 			case 'read_status':
 				$read_status = $item['read_status'];
-
-				// Output the cell content as "Read" if read_status is 1, or "Unread" otherwise.
 				return ( '1' === $read_status ) ? 'Read' : 'Unread';
 
 			case 'id':
-			case 'page_id':
-			case 'page_name':
 			case 'date_submitted':
 				return $item[ $column_name ];
 			default:
-				// return print_r($item, true); // Show the whole array for troubleshooting purposes.
+				return print_r( $item, true ); // Show the whole array for troubleshooting purposes.
 		}
 	}
 
@@ -191,13 +174,13 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 		if ( isset( $item['id'] ) ) {
 			return sprintf(
 				'<input type="checkbox" name="id[]" value="%1$s"/>',
-				$item['id']                // The value of the checkbox should be the record's ID.
+				$item['id']
 			);
 		}
 	}
 
 	/**
-	 * Get page_id column value.
+	 * Get id column value.
 	 *
 	 * @param object $item A singular item (one full row's worth of data).
 	 * @return string Text to be placed inside the column <td>.
@@ -220,10 +203,9 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 			_x( 'Details', 'List table row action', 'AQ' )
 		);
 
-		// Return the page_id contents.
+		// Return the id contents.
 		return sprintf(
-			'%2$s <span style="color:silver;">entry</span>%3$s',
-			$item['page_id'],
+			'%1$s <span style="color:silver;">entry</span>%2$s',
 			$item['id'],
 			$this->row_actions( $actions )
 		);
@@ -236,7 +218,6 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 	 * @return array An associative array containing all the bulk actions.
 	 */
 	protected function get_bulk_actions() {
-
 		$actions = array(
 			'delete' => __( 'Delete', 'text-domain' ),
 		);
@@ -253,10 +234,6 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 
 	/**
 	 * Handle bulk actions.
-	 *
-	 * Optional. You can handle your bulk actions anywhere or anyhow you prefer.
-	 * For this example package, we will handle it in the class to keep things
-	 * clean and organized.
 	 *
 	 * @see $this->prepare_items()
 	 */
@@ -278,25 +255,17 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 		}
 
 		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
-		// phpcs:ignore WordPress.DB
+        // phpcs:ignore WordPress.DB
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}kh_woo WHERE id IN({$placeholders})", $ids ) );
 	}
 
 	/**
 	 * Prepares the list of items for displaying.
-	 *
-	 * @global $wpdb
-	 * @uses $this->_column_headers
-	 * @uses $this->items
-	 * @uses $this->get_columns()
-	 * @uses $this->get_sortable_columns()
-	 * @uses $this->get_pagenum()
-	 * @uses $this->set_pagination_args()
 	 */
 	public function prepare_items() {
 		global $wpdb;
-		$form_id      = $this->form_id;
-		$per_page     = 10;
+		$per_page     = 2;
+		$product_id   = $this->product_id;
 		$columns      = $this->get_columns();
 		$hidden       = array();
 		$sortable     = $this->get_sortable_columns();
@@ -307,10 +276,10 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 		$this->process_bulk_action();
 
 		// Calculate the total number of items before calling the entries_data().
-		$total_items = $wpdb->get_var(// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$total_items = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT COUNT(*) FROM {$wpdb->prefix}kh_woo WHERE product_id = %s",
-				$form_id
+				$product_id
 			)
 		);
 
@@ -320,19 +289,50 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 
 		$this->items = $data;
 
-		/**
-		 * REQUIRED. We also have to register our pagination options & calculations.
-		 */
 		$this->set_pagination_args(
 			array(
-				'total_items' => $total_items,                   // WE have to calculate the total number of items.
-				'per_page'    => ( $per_page ),                         // WE have to determine how many items to show on a page.
+				'total_items' => $total_items,
+				'per_page'    => $per_page,
+				'total_pages' => ceil( $total_items / $per_page ),
 			)
 		);
 	}
 
+	public function get_views() {
+		$current_page = $this->get_pagenum();
+		$total_items  = $this->_pagination_args['total_items'];
+		$total_pages  = ceil( $total_items / $this->_pagination_args['per_page'] );
+
+		$output  = '<div class="tablenav-pages">';
+		$output .= sprintf(
+			'<span class="displaying-num">' . _n( '%s item', '%s items', $total_items ) . '</span>',
+			number_format_i18n( $total_items )
+		);
+
+		if ( $total_pages > 1 ) {
+			$page_links = paginate_links(
+				array(
+					'base'      => add_query_arg( 'paged', '%#%' ),
+					'format'    => '',
+					'prev_text' => __( '&laquo;' ),
+					'next_text' => __( '&raquo;' ),
+					'total'     => $total_pages,
+					'current'   => $current_page,
+				)
+			);
+
+			if ( $page_links ) {
+				$output .= "\n<span class='pagination-links'>$page_links</span>";
+			}
+		}
+
+		$output .= '</div>';
+
+		return $output;
+	}
+
 	protected function usort_reorder( $a, $b ) {
-		// phpcs:disable WordPress.Security.NonceVerification
+        // phpcs:disable WordPress.Security.NonceVerification
 		$orderby = ( ! empty( $_GET['orderby'] ) ) ? sanitize_text_field( wp_unslash( $_GET['orderby'] ) ) : 'read_status';
 		$order   = ( ! empty( $_GET['order'] ) ) ? sanitize_text_field( wp_unslash( $_GET['order'] ) ) : 'asc';
 
@@ -346,7 +346,6 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 			case 'date_submitted':
 				$result = strcmp( $a['date_submitted'], $b['date_submitted'] );
 				break;
-			// Add other column cases here if needed.
 			default:
 				return 0; // Return 0 for no sorting.
 		}
@@ -354,37 +353,24 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 		return ( $order === 'asc' ) ? $result : -$result;
 	}
 
-	/**
-	 * Get the table columns.
-	 *
-	 * @return array Array of all the list table columns.
-	 */
 	public function entries_data( $page, $items_per_page ) {
-
 		global $wpdb;
-		$offset = ( intval( $page ) - 1 ) * intval( $items_per_page );
+		$offset = ( $page - 1 ) * $items_per_page;
 
-		global $wpdb;
-		$results = array();
-		// phpcs:disable WordPress.Security.NonceVerification.Recommended
-		$orderby = isset( $_GET['orderby'] ) ? 'date_submitted' : 'date_submitted';
-
-		$order = isset( $_GET['order'] ) && $_GET['order'] === 'asc' ? 'ASC' : 'DESC';
+		$orderby = isset( $_GET['orderby'] ) ? sanitize_sql_orderby( $_GET['orderby'] ) : 'date_submitted';
+		$order   = isset( $_GET['order'] ) && strtolower( $_GET['order'] ) === 'asc' ? 'ASC' : 'DESC';
 
 		$product_id = $this->product_id;
-
-		$results = $wpdb->get_results(// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+        // phpcs:ignore WordPress.DB
+		$results = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->prefix}kh_woo WHERE product_id = %s ORDER BY %s %s LIMIT %d OFFSET %d",
+				"SELECT * FROM {$wpdb->prefix}kh_woo WHERE product_id = %s ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d",
 				$product_id,
-				$orderby,
-				$order,
 				$items_per_page,
 				$offset
 			),
 			ARRAY_A
 		);
-
 		return $results;
 	}
 }

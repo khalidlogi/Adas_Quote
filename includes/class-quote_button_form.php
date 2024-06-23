@@ -49,7 +49,7 @@ class QuoteButtonForm {
 		if ( ! in_array( $product->get_id(), $selected_products )
 		&& ( strtolower( $category->name ) === strtolower( $selected_categories )
 		|| term_is_ancestor_of( $selected_categories_by_id, $category->term_id, 'product_cat' ) ) ) {
-			print_r( "The current category '" . $category->name . "' matches the selected category which is: '" . $selected_categories . "'." );
+			// print_r( "The current category '" . $category->name . "' matches the selected category which is: '" . $selected_categories . "'." );
 		} else {
 			return;
 		}
@@ -73,26 +73,26 @@ class QuoteButtonForm {
 		// Display the quote button form
 		echo '<div class="custom-quote-form-wrapper">';
 		echo '<form id="custom-quote-form" class="custom-quote-form" action="" method="post">';
-		echo '<input type="text" name="action" value="custom_quote_request">';
+		echo '<input type="hidden" name="action" value="custom_quote_request">';
 		echo '<input placeholder="product_name" type="text" name="product_name" value="' . esc_attr( $product->get_name() ) . '">';
-		echo '<input type="text" name="product_image" value="' . esc_attr( $post_thumb ) . '"  />';
-		echo '<input type="text" name="product_link" value="' . esc_url( get_permalink() ) . '"  />';
-		echo '<input type="text" name="product_type" class="product_type" value="' . esc_attr( $product_type ) . '"  />';
-		echo '<input type="text" name="product_id" value="' . esc_attr( $product->get_id() ) . '">';
-		echo '<input type="text" class="product_quantity" name="product_quantity" placeholder="Quantity" value="1">';
-		echo '<input type="text" name="adas_user_email" id="adas_user_email" value="' . esc_attr( $user_email ) . '">';
+		echo '<input type="hidden" name="product_image" value="' . esc_attr( $post_thumb ) . '"  />';
+		echo '<input type="hidden" name="product_link" value="' . esc_url( get_permalink() ) . '"  />';
+		echo '<input type="hidden" name="product_type" class="product_type" value="' . esc_attr( $product_type ) . '"  />';
+		echo '<input type="hidden" name="product_id" value="' . esc_attr( $product->get_id() ) . '">';
+		echo '<input type="hidden" class="product_quantity" name="product_quantity" placeholder="Quantity" value="1">';
+		echo '<input type="text" name="adas_user_email" placeholder="Email" id="adas_user_email" value="' . esc_attr( $user_email ) . '">';
 		echo '<input type="text" name="phone_number" placeholder="Phone Number" id="phone_number">';
 
 		// Display additional fields for variable products
 		if ( $product->is_type( 'variable' ) ) {
-			echo '<input type="text" placeholder="variation_id" name="variation_id" id="quote_variation_id">';
-			echo '<input type="text" name="variations_attr" id="variationsAttr">';
+			echo '<input type="hidden" placeholder="variation_id" name="variation_id" id="quote_variation_id">';
+			echo '<input type="hidden" name="variations_attr" id="variationsAttr">';
 		}
 
 		echo '<textarea name="message_quote" style="width: 100%;" placeholder="Additional Notes"></textarea>';
 		echo '<input type="hidden" name="action" value="adas_send_quote" />';
 		echo '<input type="hidden" id="adas_quote_nonce" name="adas_quote_nonce" value="' . esc_attr( wp_create_nonce( 'adas_quote_action' ) ) . '" />';
-		echo '<br><button type="submit" class="custom-quote-button">_add_to_quote</button>';
+		echo '<br><button type="submit" class="custom-quote-button">Add to quote</button>';
 		echo '</form>';
 		echo '</div>';
 

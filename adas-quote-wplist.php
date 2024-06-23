@@ -11,7 +11,7 @@ add_action( 'admin_menu', 'adas_add_menu_items' );
  */
 function adas_add_menu_items() {
 	add_menu_page(
-		__( 'Adas Quote form DB List', 'AQ' ), // Page title.
+		__( 'Manage Quotes', 'AQ' ), // Page title.
 		__( 'Adas Quotes Manager', 'AQ' ),        // Menu title.
 		'activate_plugins',                                         // Capability.
 		'adas_list',                                             // Menu slug.

@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class KH_Woo_DB
+ */
 class KH_Woo_DB {
 	/**
 	 * Create the kh_woo table if it doesn't exist.
@@ -9,8 +12,9 @@ class KH_Woo_DB {
 
 		$table_name = $wpdb->prefix . 'kh_woo';
 
-		// Check if the table already exists
-		if ( $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'" ) != $table_name ) {
+		// Check if the table already exists.
+        /// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '{$table_name}'" ) !== $table_name ) {
 			$charset_collate = $wpdb->get_charset_collate();
 
 			$sql = "CREATE TABLE $table_name (

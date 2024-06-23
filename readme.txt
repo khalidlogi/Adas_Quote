@@ -1,5 +1,5 @@
 === Adas Quote for WC ===
-Contributors: adasplugins
+Contributors: khalidlogi
 Tags: quotes, WooCommerce, custom quotes, product inquiries, quote management
 Requires at least: 5.0
 Tested up to: 6.2
@@ -15,13 +15,10 @@ Empower your WooCommerce store with a robust quote request and management system
 Adas Quote for WC transforms your WooCommerce store by adding a powerful quote request and management system. This plugin bridges the gap between customers seeking custom quotes and store owners looking to provide personalized pricing.
 
 Key Features:
-* Customizable quote request form for products
 * Admin dashboard for efficient quote management
 * Email notifications for new quote requests
 * Integration with WooCommerce product pages
 * Bulk quote actions for streamlined processing
-* Quote status tracking (Pending, Approved, Rejected)
-* Export quotes to CSV for external analysis
 
 Perfect for businesses dealing with variable pricing, bulk orders, or customized products.
 
@@ -33,14 +30,11 @@ Perfect for businesses dealing with variable pricing, bulk orders, or customized
 
 == Frequently Asked Questions ==
 
-= Can I customize the quote request form? =
-Yes, you can customize the form fields in the plugin settings.
+
 
 = How are store owners notified of new quote requests? =
 Email notifications are sent to the admin email address for each new quote request.
 
-= Can customers track the status of their quote requests? =
-Yes, customers can view their quote request status in their account area.
 
 = Is this plugin compatible with my theme? =
 Adas Quote for WC is designed to be compatible with most WooCommerce themes. If you encounter any issues, please contact our support.
@@ -59,7 +53,6 @@ Adas Quote for WC is designed to be compatible with most WooCommerce themes. If 
 * Quote request form for products
 * Admin quote management interface
 * Email notifications
-* Basic reporting features
 
 == Upgrade Notice ==
 

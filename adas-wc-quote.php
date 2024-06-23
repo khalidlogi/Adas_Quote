@@ -29,16 +29,15 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-wc-settings-adas-quot
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-custom-quote-request_enqueue.php';
 
-// Include the functions.php file
-require_once plugin_dir_path( __FILE__ ) . 'includes/functions.php';
+// Include the  class-plugintoolbox.php file.
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-plugintoolbox.php';
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-quote_button_form.php';
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/class_kh_woo_db.php';
 
-// Initialize the plugin
+// Initialize the plugin.
 add_action( 'plugins_loaded', array( 'Custom_Quote_Request', 'init' ) );
 
-// Register activation hook to create custom table
-// se if it works
+// Register activation hook to create custom table.
 register_activation_hook( __FILE__, array( 'KH_Woo_DB', 'create_kh_woo_table' ) );
