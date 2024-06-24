@@ -31,19 +31,19 @@ class ADAS_Quote_Plugin {
 	public function no_products_notice() {
 		?>
 <div class="notice notice-warning">
-    <p><?php _e( 'No products found. Please create at least one product to use ADAS Quote Plugin effectively.', 'adas-quote' ); ?>
-    </p>
+	<p><?php _e( 'No products found. Please create at least one product to use ADAS Quote Plugin effectively.', 'adas-quote' ); ?>
+	</p>
 </div>
-<?php
+		<?php
 	}
 
 	public function woocommerce_missing_notice() {
 		?>
 <div class="notice notice-error">
-    <p><?php _e( 'ADAS Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.', 'adas-quote' ); ?>
-    </p>
+	<p><?php _e( 'ADAS Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.', 'adas-quote' ); ?>
+	</p>
 </div>
-<?php
+		<?php
 	}
 
 
@@ -56,7 +56,7 @@ class ADAS_Quote_Plugin {
 	public function create_admin_page() {
 		?>
 <div class="wrap">
-    <?php
+		<?php
 		if ( ! $this->check_woocommerce() ) {
 			$this->woocommerce_missing_notice();
 		} elseif ( ! $this->check_products_exist() ) {
@@ -67,7 +67,7 @@ class ADAS_Quote_Plugin {
 		}
 		?>
 </div>
-<?php
+		<?php
 	}
 
 
@@ -84,17 +84,17 @@ class ADAS_Quote_Plugin {
 	/*
 	public function create_admin_page() {
 		?>
-<div class="wrap">
-    <h2><?php _e( 'ADAS Quote Settings', 'adas-quote' ); ?></h2>
-    <form method="post" action="options.php">
-        <?php
+	<div class="wrap">
+	<h2><?php _e( 'ADAS Quote Settings', 'adas-quote' ); ?></h2>
+	<form method="post" action="options.php">
+		<?php
 				settings_fields( 'adas_quote_option_group' );
 				do_settings_sections( 'adas-quote-settings' );
 				submit_button();
 		?>
-    </form>
-</div>
-<?php
+	</form>
+	</div>
+	<?php
 	}*/
 
 	public function page_init() {
@@ -256,10 +256,20 @@ class ADAS_Quote_Plugin {
 		 * Callback function for displaying the selected products in a multi-select dropdown.
 		 */
 	function selected_products_callback() {
-		$selected_products = get_option( 'adas_quote_selected_products', array() );
-		$paged             = isset( $_REQUEST['paged'] ) ? absint( $_REQUEST['paged'] ) : 1;//phpcs:ignore WordPress.Security.NonceVerification
-		$per_page          = 50;
-		$products          = wc_get_products(
+		// $selected_products = get_option( 'adas_quote_selected_products', array() );
+		$selected_products_option = get_option( 'adas_quote_selected_products', array() );
+
+		// Ensure $selected_products is always an array
+		$selected_products = is_array( $selected_products_option ) ? $selected_products_option : array();
+
+		// Only apply array_map if $selected_products is not empty
+		$selected_products = ! empty( $selected_products ) ? array_flip( array_map( 'intval', $selected_products ) ) : array();
+
+		error_log( 'Selected products: ' . print_r( $selected_products, true ) );
+
+		$paged    = isset( $_REQUEST['paged'] ) ? absint( $_REQUEST['paged'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification
+		$per_page = 50;
+		$products = wc_get_products(
 			array(
 				'limit'   => $per_page,
 				'page'    => $paged,
@@ -270,14 +280,22 @@ class ADAS_Quote_Plugin {
 		);
 
 		if ( ! $products ) {
-			esc_html__( 'No products found.', 'AQ' );
+			echo esc_html__( 'No products found.', 'AQ' );
+			error_log( 'No products found.' );
 			return;
 		}
 
 		echo '<select multiple name="adas_quote_selected_products[]" style="width: 300px;">';
 		foreach ( $products as $product ) {
-			$selected = in_array( $product->get_id(), $selected_products ) ? 'selected' : '';
-			echo '<option value="' . esc_attr( $product->get_id() ) . '" ' . esc_attr( $selected ) . '>' . esc_html( $product->get_name() ) . '</option>';
+			$product_id  = (int) $product->get_id();
+			$is_selected = isset( $selected_products[ $product_id ] );
+			error_log( "Product ID: $product_id, Is Selected: " . ( $is_selected ? 'Yes' : 'No' ) );
+			printf(
+				'<option value="%d" %s>%s</option>',
+				$product_id,
+				$is_selected ? 'selected' : '',
+				esc_html( $product->get_name() )
+			);
 		}
 		echo '</select>';
 
@@ -290,14 +308,16 @@ class ADAS_Quote_Plugin {
 		);
 		$total_pages    = ceil( count( $total_products ) / $per_page );
 
-		echo '<span class="displaying-num">' . esc_html(
-			sprintf(
-			// Translators: 1: Number of products.
-			    // phpcs:ignore WordPress.WP.I18n
-				_n( '1 product', '%s products', count( $total_products ), 'AQ' ),
-				count( $total_products )
+		printf(
+			'<span class="displaying-num">%s</span>',
+			esc_html(
+				sprintf(
+					// Translators: 1: Number of products.
+					_n( '1 product', '%s products', count( $total_products ), 'AQ' ),
+					count( $total_products )
+				)
 			)
-		) . '</span>';
+		);
 
 		$pagination_args = array(
 			'base'      => add_query_arg( 'paged', '%#%' ),
@@ -308,7 +328,7 @@ class ADAS_Quote_Plugin {
 			'current'   => $paged,
 		);
 
-		echo '<span class="pagination-links">' . esc_html( paginate_links( $pagination_args ) ) . '</span>';
+		echo '<span class="pagination-links">' . paginate_links( $pagination_args ) . '</span>';
 	}
 
 
@@ -339,12 +359,12 @@ class ADAS_Quote_Plugin {
 	private function display_settings_form() {
 		?>
 <form method="post" action="options.php">
-    <?php
+		<?php
 			settings_fields( 'adas_quote_settings_group' );
 			do_settings_sections( 'adas-quote-settings' );
 			submit_button();
 		?>
 </form>
-<?php
+		<?php
 	}
 }

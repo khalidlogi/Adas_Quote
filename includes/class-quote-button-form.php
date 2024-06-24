@@ -46,7 +46,8 @@ class QuoteButtonForm {
 
 		// Check if the current product or its category matches the selected categories.
 		$category = array_reverse( $current_categories )[0];
-		if ( ! in_array( $product->get_id(), $selected_products )
+		if ( ! in_array( $product->get_id(), (array) $selected_products )
+
 		&& ( strtolower( $category->name ) === strtolower( $selected_categories )
 		|| term_is_ancestor_of( $selected_categories_by_id, $category->term_id, 'product_cat' ) ) ) {
 			// print_r( "The current category '" . $category->name . "' matches the selected category which is: '" . $selected_categories . "'." );
