@@ -26,12 +26,12 @@ function adas_db_init() {
 
 add_action( 'init', 'adas_db_init' );
 
-// Include the main class file
+// Include the main class file.
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-custom-quote-request.php';
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-wc-settings-adas-quote.php';
 
-require_once plugin_dir_path( __FILE__ ) . 'includes/class-custom-quote-request-enqueue.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-custom-enqueue.php';
 
 // Include the  class-plugintoolbox.php file.
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-plugintoolbox.php';
@@ -42,6 +42,11 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class_kh_woo_db.php';
 
 // Initialize the plugin.
 add_action( 'plugins_loaded', array( 'Custom_Quote_Request', 'init' ) );
+
+function adas_quote_init() {
+	ADAS_Quote_Plugin::get_instance();
+}
+add_action( 'plugins_loaded', 'adas_quote_init' );
 
 // Register activation hook to create custom table.
 register_activation_hook( __FILE__, array( 'KH_Woo_DB', 'create_kh_woo_table' ) );

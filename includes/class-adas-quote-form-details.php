@@ -277,6 +277,7 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 		$this->process_bulk_action();
 
 		// Calculate the total number of items before calling the entries_data().
+		/// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$total_items = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT COUNT(*) FROM {$wpdb->prefix}kh_woo WHERE product_id = %s",
@@ -310,11 +311,11 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 		$total_pages  = ceil( $total_items / $this->_pagination_args['per_page'] );
 
 		$output = '<div class="tablenav-pages">';
-		// translators: %s: Number of items.
-		$output .= sprintf(
-			'<span class="displaying-num">' . _n( '%s item', '%s items', $total_items ) . '</span>',
-			number_format_i18n( $total_items )
-		);
+			// translators: %s: Number of items.
+			$output .= sprintf(
+				'<span class="displaying-num">' . _n( '%s item', '%s items', $total_items ) . '</span>',
+				number_format_i18n( $total_items )
+			);
 
 		if ( $total_pages > 1 ) {
 			$page_links = paginate_links(
@@ -377,13 +378,13 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 	public function entries_data( $page, $items_per_page ) {
 		global $wpdb;
 
-		// Sanitize input parameters
+		// Sanitize input parameters.
 		$page           = absint( $page );
 		$items_per_page = absint( $items_per_page );
 		$offset         = ( $page - 1 ) * $items_per_page;
 
-		// Sanitize and validate orderby
-		$valid_orderby_columns = array( 'date_submitted', 'id', 'product_id' ); // Add all valid column names
+		// Sanitize and validate orderby.
+		$valid_orderby_columns = array( 'date_submitted', 'id', 'product_id' ); // Add all valid column names.
 		$orderby               = isset( $_GET['orderby'] ) && in_array( $_GET['orderby'], $valid_orderby_columns )
 			? sanitize_sql_orderby( wp_unslash( $_GET['orderby'] ) )
 			: 'date_submitted';

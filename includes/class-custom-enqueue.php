@@ -17,14 +17,14 @@ class Custom_Enqueue {
 	 * Enqueue custom CSS for the admin settings page.
 	 */
 	public static function adas_quote_admin_styles() {
-		wp_enqueue_style( 'adas-quote-admin-styles', plugin_dir_url( __FILE__ ) . '../css/admin-styles.css', array(), '1.0.0' );
+		wp_enqueue_style( 'adas-quote-admin-styles', plugin_dir_url( __FILE__ ) . '../css/admin-styles.css' );
 	}
 
 	/**
 	 * Enqueue necessary scripts and styles for the front-end.
 	 */
 	public static function enqueue_scripts() {
-		// Ensure jQuery is enqueued
+		// Ensure jQuery is enqueued.
 		wp_enqueue_script( 'jquery' );
 
 		// Enqueue Bootstrap CSS.
