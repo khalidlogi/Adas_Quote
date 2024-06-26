@@ -3,8 +3,8 @@
  * Plugin Name: Adas Quote for WC
  * Description: Display Quote for quotes.
  * Version: 1.0.0
- * Author: Your Name
- * Text Domain: custom-variation-alert
+ * Author: Khalidlogi
+ * Text Domain: adas_quote_request
  *
  * @package AdasQuoteForWC
  */

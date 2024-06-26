@@ -12,6 +12,19 @@ class ADAS_Quote_Plugin {
 	private function __construct() {
 		add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
 		add_action( 'admin_init', array( $this, 'page_init' ) );
+		add_filter( 'plugin_action_links_' . plugin_basename( dirname( __DIR__ ) . '/adas-wc-quote.php' ), array( $this, 'add_settings_link' ) );
+	}
+
+	/**
+	 * Add settings link to the plugin's entry on the plugins page.
+	 *
+	 * @param array $links Existing links.
+	 * @return array Modified links.
+	 */
+	public function add_settings_link( $links ) {
+		$settings_link = '<a href="options-general.php?page=adas-quote-settings">' . __( 'Settings', 'AQ' ) . '</a>';
+		array_unshift( $links, $settings_link );
+		return $links;
 	}
 
 	public function check_woocommerce() {
@@ -31,19 +44,27 @@ class ADAS_Quote_Plugin {
 	public function no_products_notice() {
 		?>
 <div class="notice notice-warning">
-	<p><?php _e( 'No products found. Please create at least one product to use ADAS Quote Plugin effectively.', 'adas-quote' ); ?>
-	</p>
+    <p>
+        <?php
+		esc_html_e(
+			'No products found. Please create at least one product to use ADAS Quote Plugin effectively.',
+			'ADAS Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.
+
+'
+		);
+		?>
+    </p>
 </div>
-		<?php
+<?php
 	}
 
 	public function woocommerce_missing_notice() {
 		?>
 <div class="notice notice-error">
-	<p><?php _e( 'ADAS Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.', 'adas-quote' ); ?>
-	</p>
+    <p><?php esc_html_e( 'ADAS Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.', 'AQ' ); ?>
+    </p>
 </div>
-		<?php
+<?php
 	}
 
 
@@ -56,7 +77,7 @@ class ADAS_Quote_Plugin {
 	public function create_admin_page() {
 		?>
 <div class="wrap">
-		<?php
+    <?php
 		if ( ! $this->check_woocommerce() ) {
 			$this->woocommerce_missing_notice();
 		} elseif ( ! $this->check_products_exist() ) {
@@ -67,7 +88,7 @@ class ADAS_Quote_Plugin {
 		}
 		?>
 </div>
-		<?php
+<?php
 	}
 
 
@@ -84,17 +105,17 @@ class ADAS_Quote_Plugin {
 	/*
 	public function create_admin_page() {
 		?>
-	<div class="wrap">
-	<h2><?php _e( 'ADAS Quote Settings', 'adas-quote' ); ?></h2>
-	<form method="post" action="options.php">
-		<?php
+<div class="wrap">
+    <h2><?php _e( 'ADAS Quote Settings', 'adas-quote' ); ?></h2>
+    <form method="post" action="options.php">
+        <?php
 				settings_fields( 'adas_quote_option_group' );
 				do_settings_sections( 'adas-quote-settings' );
 				submit_button();
 		?>
-	</form>
-	</div>
-	<?php
+    </form>
+</div>
+<?php
 	}*/
 
 	public function page_init() {
@@ -187,7 +208,15 @@ class ADAS_Quote_Plugin {
 
 	public function section_info() {
 		// translators: %s: Plugin name
-		printf( '<p>%s</p>', esc_html__( 'Configure settings for the ADAS Quote plugin.', 'adas-quote' ) );
+		printf(
+			'<p>%s</p>',
+			esc_html__(
+				'Configure settings for the ADAS Quote plugin.',
+				'ADAS Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.
+
+'
+			)
+		);
 	}
 
 	public function enable_quote_callback() {
@@ -359,12 +388,12 @@ class ADAS_Quote_Plugin {
 	private function display_settings_form() {
 		?>
 <form method="post" action="options.php">
-		<?php
+    <?php
 			settings_fields( 'adas_quote_settings_group' );
 			do_settings_sections( 'adas-quote-settings' );
 			submit_button();
 		?>
 </form>
-		<?php
+<?php
 	}
 }

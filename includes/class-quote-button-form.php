@@ -40,22 +40,34 @@ class QuoteButtonForm {
 		$current_categories = array_reverse( get_the_terms( $product->get_id(), 'product_cat' ) );
 
 		// Get the selected categories from the options.
+		// Get the selected categories from the options.
 		$selected_categories       = get_option( 'adas_quote_selected_categories' );
 		$selected_categories_by_id = get_term_by( 'name', $selected_categories, 'product_cat' );
-		$selected_categories_by_id = $selected_categories_by_id->term_id;
+
+		if ( $selected_categories_by_id ) {
+			$selected_categories_by_id = $selected_categories_by_id->term_id;
+		} else {
+			$selected_categories_by_id = null; // or handle the case where the term is not found
+		}
 
 		// Check if the current product or its category matches the selected categories.
 		$category = array_reverse( $current_categories )[0];
-		if ( ! in_array( $product->get_id(), (array) $selected_products )
-
-		&& ( strtolower( $category->name ) === strtolower( $selected_categories )
+		if ( in_array( $product->get_id(), (array) $selected_products )
+		|| ( strtolower( $category->name ) === strtolower( $selected_categories )
 		|| term_is_ancestor_of( $selected_categories_by_id, $category->term_id, 'product_cat' ) ) ) {
 			// print_r( "The current category '" . $category->name . "' matches the selected category which is: '" . $selected_categories . "'." );
+			// print_r( 'and the current product ID is: ' . $product->get_id() );
 		} else {
+			// print_r( "The current category '" . $category->name . "' does NOT matches the selected category which is: '" . $selected_categories . "'." );
+			// print_r( 'and the current product ID is: ' . $product->get_id() );
+			// echo '<br />';
+			// print_r( 'and the selected product IDs are: ' . implode( ', ', (array) $selected_products ) );
+			// echo '<br />';
+
 			return;
 		}
 
-		// Get the product type
+		// Get the product type.
 		$product_     = wc_get_product( get_the_ID() );
 		$product_type = ( $product_->get_type() ) ? 'variation' : $product_->get_type();
 
