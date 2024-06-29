@@ -44,8 +44,8 @@ class ADAS_Quote_Plugin {
 	public function no_products_notice() {
 		?>
 <div class="notice notice-warning">
-	<p>
-		<?php
+    <p>
+        <?php
 		esc_html_e(
 			'No products found. Please create at least one product to use ADAS Quote Plugin effectively.',
 			'ADAS Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.
@@ -53,18 +53,18 @@ class ADAS_Quote_Plugin {
 '
 		);
 		?>
-	</p>
+    </p>
 </div>
-		<?php
+<?php
 	}
 
 	public function woocommerce_missing_notice() {
 		?>
 <div class="notice notice-error">
-	<p><?php esc_html_e( 'ADAS Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.', 'AQ' ); ?>
-	</p>
+    <p><?php esc_html_e( 'ADAS Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.', 'AQ' ); ?>
+    </p>
 </div>
-		<?php
+<?php
 	}
 
 
@@ -77,7 +77,7 @@ class ADAS_Quote_Plugin {
 	public function create_admin_page() {
 		?>
 <div class="wrap">
-		<?php
+    <?php
 		if ( ! $this->check_woocommerce() ) {
 			$this->woocommerce_missing_notice();
 		} elseif ( ! $this->check_products_exist() ) {
@@ -88,7 +88,7 @@ class ADAS_Quote_Plugin {
 		}
 		?>
 </div>
-		<?php
+<?php
 	}
 
 
@@ -105,17 +105,17 @@ class ADAS_Quote_Plugin {
 	/*
 	public function create_admin_page() {
 		?>
-	<div class="wrap">
-	<h2><?php _e( 'ADAS Quote Settings', 'adas-quote' ); ?></h2>
-	<form method="post" action="options.php">
-		<?php
+<div class="wrap">
+    <h2><?php _e( 'ADAS Quote Settings', 'adas-quote' ); ?></h2>
+    <form method="post" action="options.php">
+        <?php
 				settings_fields( 'adas_quote_option_group' );
 				do_settings_sections( 'adas-quote-settings' );
 				submit_button();
 		?>
-	</form>
-	</div>
-	<?php
+    </form>
+</div>
+<?php
 	}*/
 
 	public function page_init() {
@@ -145,11 +145,11 @@ class ADAS_Quote_Plugin {
 		);
 		register_setting(
 			'adas_quote_settings_group',
-			'gmail_smtp_username'
+			'adas_quote_gmail_smtp_username'
 		);
 		register_setting(
 			'adas_quote_settings_group',
-			'gmail_smtp_password'
+			'adas_quote_gmail_smtp_password'
 		);
 
 		add_settings_section(
@@ -166,18 +166,18 @@ class ADAS_Quote_Plugin {
 		);
 
 		add_settings_field(
-			'adas_smtp_settings_section',
+			'adas_quote_gmail_smtp_username',
 			'Gmail SMTP Username',
 			array( $this, 'gmail_smtp_username_callback' ),
 			'adas-quote-settings',
-			'adas_quote_settings_section'
+			'adas_smtp_settings_section'
 		);
 		add_settings_field(
-			'adas_smtp_settings_section',
+			'adas_quote_gmail_smtp_password',
 			'Gmail SMTP Password',
 			array( $this, 'gmail_smtp_password_callback' ),
 			'adas-quote-settings',
-			'adas_quote_settings_section'
+			'adas_smtp_settings_section'
 		);
 
 		add_settings_field(
@@ -231,16 +231,16 @@ class ADAS_Quote_Plugin {
 	 * Callback function for displaying the Gmail SMTP Username input field.
 	 */
 	function gmail_smtp_username_callback() {
-		$option = get_option( 'gmail_smtp_username' );
-		echo '<input type="text" name="gmail_smtp_username" value="' . esc_attr( $option ) . '" />';
+		$option = get_option( 'adas_quote_gmail_smtp_username' );
+		echo '<input type="text" name="adas_quote_gmail_smtp_username" value="' . esc_attr( $option ) . '" />';
 	}
 
 	/**
 	 * Callback function for displaying the Gmail SMTP Password input field.
 	 */
 	function gmail_smtp_password_callback() {
-		$option = get_option( 'gmail_smtp_password' );
-		echo '<input type="password" name="gmail_smtp_password" value="' . esc_attr( $option ) . '" />';
+		$option = get_option( 'adas_quote_gmail_smtp_password' );
+		echo '<input type="text" name="adas_quote_gmail_smtp_password" value="' . esc_attr( $option ) . '" />';
 	}
 
 	public function sanitize( $input ) {
@@ -440,12 +440,12 @@ class ADAS_Quote_Plugin {
 	private function display_settings_form() {
 		?>
 <form method="post" action="options.php">
-		<?php
+    <?php
 			settings_fields( 'adas_quote_settings_group' );
 			do_settings_sections( 'adas-quote-settings' );
 			submit_button();
 		?>
 </form>
-		<?php
+<?php
 	}
 }
