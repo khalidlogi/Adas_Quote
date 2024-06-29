@@ -37,7 +37,7 @@ class Custom_Quote_Request {
 	 *
 	 * @return void
 	 */
-	public static function a_q_hide_add_to_cart_button() {
+	public static function AQ_hide_add_to_cart_button() {
 		if ( get_option( 'adas_quote_hide_add_to_cart' ) == 1 ) {
 			?>
 <style type="text/css">
@@ -64,6 +64,7 @@ class Custom_Quote_Request {
 	 * @return void
 	 */
 	public static function enqueue_scripts() {
+		error_log( 'enqueue_scripts' );
 		// Ensure jQuery is enqueued.
 		wp_enqueue_script( 'jquery' );
 
@@ -118,7 +119,9 @@ class Custom_Quote_Request {
 		$variations_attr  = isset( $_POST['variations_attr'] ) ? json_decode( stripslashes( sanitize_text_field( wp_unslash( $_POST['variations_attr'] ) ) ), true ) : array();
 
 		// Validate required fields.
-		if ( empty( $product_id ) || empty( $variation_id ) || empty( $useremail ) ) {
+		// if ( empty( $product_id ) || empty( $variation_id ) || empty( $useremail ) ) {
+		if ( empty( $product_id ) ) {
+
 			wp_send_json_error( 'Missing required data', 400 );
 			wp_die();
 		}

@@ -105,6 +105,12 @@ class QuoteButtonForm {
 		echo '<textarea name="message_quote" style="width: 100%;" placeholder="Additional Notes"></textarea>';
 		echo '<input type="hidden" name="action" value="adas_send_quote" />';
 		echo '<input type="hidden" id="adas_quote_nonce" name="adas_quote_nonce" value="' . esc_attr( wp_create_nonce( 'adas_quote_action' ) ) . '" />';
+
+		// Add loading indicator
+		// echo '<div id="loadingIndicator" style="display: none;">Loading...</div>';
+		echo '  <div id="loadingIndicator" style="display: none;">
+        <i class="fas fa-spinner fa-spin"></i> Loading...
+    </div>';
 		echo '<br><button type="submit" class="custom-quote-button">Add to quote</button>';
 		echo '</form>';
 		echo '</div>';

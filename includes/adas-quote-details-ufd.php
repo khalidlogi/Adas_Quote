@@ -135,8 +135,11 @@ class Adas_Quote_Form_Details_Ufd {
 		$read_status      = ( '1' === $read_status ) ? 'Read' : 'Not Read';
 		$date_submitted   = $result['date_submitted'];
 
-		if ( empty( $results ) ) {
-			wp_die( 'Not valid contact form' );
+		if ( empty( $result ) ) {
+			echo( 'Not valid contact form' );
+			print_r( $results, true );
+		} else {
+			print_r( $results, true );
 		}
 
 		// Output the HTML structure to display the form details.

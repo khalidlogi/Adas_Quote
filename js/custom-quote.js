@@ -56,9 +56,10 @@ jQuery(document).ready(function ($) {
     }
 
     function handleFormSubmit(event) {
+        console.log('Form submission initiated');
         event.preventDefault();
         clearErrorHighlights();
-
+    
         const formData = {
             action: 'handle_quote_request',
             product_quantity: customQuoteForm.find('input[name="product_quantity"]').val(),
@@ -73,29 +74,49 @@ jQuery(document).ready(function ($) {
             variations_attr: $('#variationsAttr').val(),
             custom_quote_request_nonce: customQuoteForm.find('input[name="adas_quote_nonce"]').val()
         };
-
+    
+        console.log('Form data:', formData);
+    
         const errors = validateForm(formData);
         if (errors.length > 0) {
+            console.log('Form validation errors:', errors);
             highlightErrorFields(errors);
             return;
         }
-
+    
+        console.log('AJAX URL:', custom_quote_params.ajax_url);
+    
+        // Show loading indicator
+        $('#loadingIndicator').show();
+    
         $.ajax({
             url: custom_quote_params.ajax_url,
             type: 'POST',
             data: formData,
+            dataType: 'json',
             success: function (response) {
                 console.log('AJAX Response:', response);
                 if (response.success) {
-                    console.log(response.data);
+                    console.log('Quote request successful:', response.data);
                     quoteSuccessModal.modal('show');
                 } else {
+                    console.error('Quote request failed:', response.data);
                     alert('Failed to send quote request: ' + response.data);
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                console.error('AJAX Error:', textStatus, errorThrown);
-                alert('An error occurred while sending the quote request.');
+                console.error('AJAX Error:', {
+                    status: jqXHR.status,
+                    statusText: jqXHR.statusText,
+                    responseText: jqXHR.responseText,
+                    textStatus: textStatus,
+                    errorThrown: errorThrown
+                });
+                alert('An error occurred while sending the quote request. Please check the console for more details.');
+            },
+            complete: function() {
+                // Hide loading indicator
+                $('#loadingIndicator').hide();
             }
         });
     }

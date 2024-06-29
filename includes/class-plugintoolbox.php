@@ -22,6 +22,88 @@ class PluginToolbox {
 	 * @param array $data The data for the quote request.
 	 * @return bool True if the email was sent successfully, false otherwise.
 	 */
+	// public static function send_email( $data ) {
+	// ... (previous code for data validation)
+
+	// Load PHPMailer
+	// require_once ABSPATH . WPINC . '/PHPMailer/PHPMailer.php';
+	// require_once ABSPATH . WPINC . '/PHPMailer/SMTP.php';
+	// require_once ABSPATH . WPINC . '/PHPMailer/Exception.php';
+
+	// $mail = new PHPMailer\PHPMailer\PHPMailer( true );
+
+	// try {
+	// Server settings
+	// $mail->isSMTP();
+	// $mail->Host       = 'smtp.gmail.com'; // Replace with your SMTP server
+	// $mail->SMTPAuth   = true;
+	// $mail->Username   = 'khalidlogi2@gmail.com'; // Replace with your SMTP username
+	// $mail->Password   = 'gnml shyn qhwj cvha'; // Replace with your SMTP password
+	// $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+	// $mail->Port       = 25;
+
+	// Recipients
+	// $mail->setFrom( $admin_email, $site_title );
+	// $mail->addAddress( $to_send );
+
+	// Content
+	// $mail->isHTML( true );
+	// $mail->Subject = $email_title;
+	// $mail->Body    = $message;
+
+	// $mail->send();
+
+	// Send admin notification
+	// $mail->clearAddresses();
+	// $mail->addAddress( $admin_email );
+	// $mail->Subject = __( 'Quote Enquiry', 'AQ' );
+	// $mail->Body    = $admin_message;
+	// $mail->send();
+
+	// return true;
+	// } catch ( Exception $e ) {
+	// error_log( "Message could not be sent. Mailer Error: {$mail->ErrorInfo}" );
+	// return false;
+	// }
+	// }
+
+	// public static function send_email( $data ) {
+	// if ( ! is_array( $data ) || empty( $data ) ) {
+	// return false;
+	// }
+
+	// $product = wc_get_product( $data['product_id'] );
+	// if ( ! $product ) {
+	// return false;
+	// }
+
+	// $message = self::generate_email_body( $data, $product );
+
+	// $quote_admin_email = get_option( 'wc_settings_quote_admin_email' );
+	// $admin_email       = $quote_admin_email ? sanitize_email( $quote_admin_email ) : get_option( 'admin_email' );
+	// $site_title        = get_bloginfo( 'name' );
+	// $to_send           = sanitize_email( $data['user_email'] );
+
+	// $headers = array(
+	// 'Content-Type: text/html; charset=UTF-8',
+	// sprintf( 'From: %s <%s>', esc_html( $site_title ), $admin_email ),
+	// );
+
+	// $quote_email_title = get_option( 'wc_settings_quote_email_subject', __( 'Quote', 'AQ' ) );
+	// $email_title       = sanitize_text_field( $quote_email_title );
+
+	// $customer_email_sent = wp_mail( $to_send, $email_title, $message, $headers );
+
+	// if ( $customer_email_sent ) {
+	// Translators: %s is the email address to which the quote has been sent.
+	// $admin_message = $message . '<p>' . sprintf( esc_html__( 'Quote has been sent to %s', 'AQ' ), esc_html( $to_send ) ) . '</p>';
+	// wp_mail( $admin_email, esc_html__( 'Quote Enquiry', 'AQ' ), $admin_message, $headers );
+	// return true;
+	// } else {
+	// return false;
+	// }
+	// }
+
 	public static function send_email( $data ) {
 		if ( ! is_array( $data ) || empty( $data ) ) {
 			return false;
@@ -39,22 +121,48 @@ class PluginToolbox {
 		$site_title        = get_bloginfo( 'name' );
 		$to_send           = sanitize_email( $data['user_email'] );
 
-		$headers = array(
-			'Content-Type: text/html; charset=UTF-8',
-			sprintf( 'From: %s <%s>', esc_html( $site_title ), $admin_email ),
-		);
-
 		$quote_email_title = get_option( 'wc_settings_quote_email_subject', __( 'Quote', 'AQ' ) );
 		$email_title       = sanitize_text_field( $quote_email_title );
 
-		$customer_email_sent = wp_mail( $to_send, $email_title, $message, $headers );
+		// Load PHPMailer
+		require_once ABSPATH . WPINC . '/PHPMailer/PHPMailer.php';
+		require_once ABSPATH . WPINC . '/PHPMailer/SMTP.php';
+		require_once ABSPATH . WPINC . '/PHPMailer/Exception.php';
 
-		if ( $customer_email_sent ) {
-			// Translators: %s is the email address to which the quote has been sent.
+		$mail = new PHPMailer\PHPMailer\PHPMailer( true );
+
+		try {
+			// Server settings
+			$mail->isSMTP();
+			$mail->Host       = 'smtp.gmail.com'; // Replace with your SMTP server
+			$mail->SMTPAuth   = true;
+			$mail->Username   = get_option( 'my_plugin_smtp_username' );
+			$mail->Password   = get_option( 'my_plugin_smtp_password' );
+			$mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+			$mail->Port       = 587;
+
+			// Recipients
+			$mail->setFrom( $admin_email, $site_title );
+			$mail->addAddress( $to_send );
+
+			// Content
+			$mail->isHTML( true );
+			$mail->Subject = $email_title;
+			$mail->Body    = $message;
+
+			$mail->send();
+
+			// Send admin notification
 			$admin_message = $message . '<p>' . sprintf( esc_html__( 'Quote has been sent to %s', 'AQ' ), esc_html( $to_send ) ) . '</p>';
-			wp_mail( $admin_email, esc_html__( 'Quote Enquiry', 'AQ' ), $admin_message, $headers );
+			$mail->clearAddresses();
+			$mail->addAddress( $admin_email );
+			$mail->Subject = __( 'Quote Enquiry', 'AQ' );
+			$mail->Body    = $admin_message;
+			$mail->send();
+
 			return true;
-		} else {
+		} catch ( Exception $e ) {
+			error_log( "Message could not be sent. Mailer Error: {$mail->ErrorInfo}" );
 			return false;
 		}
 	}

@@ -71,3 +71,62 @@ input[type="submit"] {
 input[type="submit"]:hover {
     background-color: #005177;
 }
+
+/*style the detail quote page */
+.adas-form-details-wrap {
+    font-size: 16px;
+}
+.form-information span {
+    margin-left: 1em;
+}
+.adas-form-details-wrapper {
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+.cfdb7-panel {
+    background: #fff;
+    position: relative;
+    border: 1px solid #e5e5e5;
+    padding: 20px;
+    border-radius: 5px;
+}
+.cfdb7-panel-content {
+    margin: 0;
+}
+.welcome-panel-column-container {
+    display: flex;
+    flex-direction: column;
+}
+.welcome-panel-column-container h3 {
+    margin-top: 0;
+}
+.welcome-panel-column-container p {
+    margin: 10px 0;
+}
+.welcome-panel-column-container img {
+ margin: 18px;
+}
+.title-image {
+    top: 20px;
+    position: relative; 
+    text-align: center;
+    right: 20px;
+    position: absolute;
+}
+.welcome-panel-column-container p {
+    margin: 10px 0;
+}
+.welcome-panel-column-container img {
+    text-align: center;
+    /* margin-left: 21%; */
+    border: 1px dotted gray;
+    border-radius: 50%;
+}
+
+p.product_name {
+    font-weight: bold;
+    color: #6a6ae8;
+    font-size: 1.31em;}

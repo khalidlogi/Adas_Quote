@@ -58,6 +58,10 @@
     background-color: #005177;
 }
 
+.custom-quote-form input {
+
+    margin-bottom: 5px!important;
+}
 
 .error-highlight {
     border: 1px solid red;
