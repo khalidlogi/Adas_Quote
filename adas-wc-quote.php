@@ -40,9 +40,17 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-quote-button-form.php
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/class_kh_woo_db.php';
 
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-aq-error-logger.php';
+
 // Initialize the plugin.
 add_action( 'plugins_loaded', array( 'Custom_Quote_Request', 'init' ) );
 
+/**
+ *
+ *  This function is used to initialize the plugin.
+ *
+ * @return void
+ */
 function adas_quote_init() {
 	ADAS_Quote_Plugin::get_instance();
 }

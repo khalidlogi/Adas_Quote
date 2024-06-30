@@ -1,7 +1,22 @@
 <?php
+/**
+ * Class ADAS_Quote_Plugin
+ *
+ * This class handles the initialization and settings of the ADAS Quote Plugin.
+ */
 class ADAS_Quote_Plugin {
+	/**
+	 * The single instance of the class.
+	 *
+	 * @var ADAS_Quote_Plugin|null The single instance of the class.
+	 */
 	private static $instance = null;
 
+	/**
+	 * Get the singleton instance of the class.
+	 *
+	 * @return ADAS_Quote_Plugin The instance of the class.
+	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {
 			self::$instance = new self();
@@ -9,6 +24,11 @@ class ADAS_Quote_Plugin {
 		return self::$instance;
 	}
 
+	/**
+	 * Constructor.
+	 *
+	 * Initializes the plugin by adding necessary actions and filters.
+	 */
 	private function __construct() {
 		add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
 		add_action( 'admin_init', array( $this, 'page_init' ) );
@@ -27,10 +47,20 @@ class ADAS_Quote_Plugin {
 		return $links;
 	}
 
+		/**
+		 * Check if WooCommerce is installed and active.
+		 *
+		 * @return bool True if WooCommerce is active, false otherwise.
+		 */
 	public function check_woocommerce() {
 		return class_exists( 'WooCommerce' );
 	}
 
+	/**
+	 * Check if there are any published products.
+	 *
+	 * @return bool True if there are published products, false otherwise.
+	 */
 	public function check_products_exist() {
 		$args     = array(
 			'post_type'      => 'product',
@@ -41,11 +71,14 @@ class ADAS_Quote_Plugin {
 		return ! empty( $products );
 	}
 
+	/**
+	 * Display a notice if no products are found.
+	 */
 	public function no_products_notice() {
 		?>
 <div class="notice notice-warning">
-    <p>
-        <?php
+	<p>
+		<?php
 		esc_html_e(
 			'No products found. Please create at least one product to use ADAS Quote Plugin effectively.',
 			'ADAS Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.
@@ -53,31 +86,27 @@ class ADAS_Quote_Plugin {
 '
 		);
 		?>
-    </p>
+	</p>
 </div>
-<?php
+		<?php
 	}
 
 	public function woocommerce_missing_notice() {
 		?>
 <div class="notice notice-error">
-    <p><?php esc_html_e( 'ADAS Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.', 'AQ' ); ?>
-    </p>
+	<p><?php esc_html_e( 'ADAS Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.', 'AQ' ); ?>
+	</p>
 </div>
-<?php
+		<?php
 	}
 
-
-
-
-
-
-
-
+	/**
+	 * Create the admin page for the plugin settings.
+	 */
 	public function create_admin_page() {
 		?>
 <div class="wrap">
-    <?php
+		<?php
 		if ( ! $this->check_woocommerce() ) {
 			$this->woocommerce_missing_notice();
 		} elseif ( ! $this->check_products_exist() ) {
@@ -86,12 +115,42 @@ class ADAS_Quote_Plugin {
 		} else {
 			$this->display_settings_form();
 		}
+
+		// Display email errors if the checkbox is checked.
+		$display_errors = get_option( 'adas_quote_display_email_errors' );
+		if ( ! empty( $display_errors ) ) {
+			$this->display_email_errors();
+		}
+
 		?>
 </div>
-<?php
+		<?php
+	}
+
+	/**
+	 * Display email errors from the logs.
+	 */
+	private function display_email_errors() {
+		$errors = get_option( 'adas_quote_email_errors', array() );
+		if ( ! empty( $errors ) ) {
+			// Reverse the order of errors.
+			$errors = array_reverse( $errors );
+
+			echo '<h2>Email Logs</h2>';
+			echo '<ul>';
+			foreach ( $errors as $error ) {
+				echo '<li><strong>Time:</strong> ' . esc_html( $error['time'] ) . ' - <strong>Log:</strong> ' . esc_html( $error['error'] ) . '</li>';
+			}
+			echo '</ul>';
+		} else {
+			echo '<p>No email errors found.</p>';
+		}
 	}
 
 
+	/**
+	 * Add the plugin settings page to the admin menu.
+	 */
 	public function add_plugin_page() {
 		add_options_page(
 			'ADAS Quote Settings',
@@ -102,22 +161,11 @@ class ADAS_Quote_Plugin {
 		);
 	}
 
-	/*
-	public function create_admin_page() {
-		?>
-<div class="wrap">
-    <h2><?php _e( 'ADAS Quote Settings', 'adas-quote' ); ?></h2>
-    <form method="post" action="options.php">
-        <?php
-				settings_fields( 'adas_quote_option_group' );
-				do_settings_sections( 'adas-quote-settings' );
-				submit_button();
-		?>
-    </form>
-</div>
-<?php
-	}*/
 
+
+	/**
+	 * Initialize the settings page.
+	 */
 	public function page_init() {
 		register_setting(
 			'adas_quote_settings_group',
@@ -155,6 +203,10 @@ class ADAS_Quote_Plugin {
 			'adas_quote_settings_group',
 			'adas_quote_email_subject'
 		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_display_email_errors'
+		);
 
 		add_settings_section(
 			'adas_quote_settings_section',
@@ -185,13 +237,26 @@ class ADAS_Quote_Plugin {
 		);
 
 		add_settings_field(
+			'adas_quote_display_email_errors',
+			'Display Email Errors',
+			array( $this, 'display_email_errors_callback' ),
+			'adas-quote-settings',
+			'adas_smtp_settings_section'
+		);
+		add_settings_field(
 			'adas_quote_selected_categories',
 			'Select Categories for Quote Button',
 			array( $this, 'selected_categories_callback' ),
 			'adas-quote-settings',
 			'adas_quote_settings_section'
 		);
-
+		add_settings_field(
+			'adas_quote_selected_products',
+			'Select Products for Quote Button',
+			array( $this, 'selected_products_callback' ),
+			'adas-quote-settings',
+			'adas_quote_settings_section'
+		);
 		add_settings_field(
 			'adas_quote_hide_add_to_cart',
 			'Hide Add To Cart Button',
@@ -224,13 +289,6 @@ class ADAS_Quote_Plugin {
 		);
 
 		add_settings_field(
-			'adas_quote_selected_products',
-			'Select Products for Quote Button',
-			array( $this, 'selected_products_callback' ),
-			'adas-quote-settings',
-			'adas_quote_settings_section'
-		);
-		add_settings_field(
 			'adas_quote_admin_email',
 			'Admin Email',
 			array( $this, 'admin_email_callback' ),
@@ -239,10 +297,18 @@ class ADAS_Quote_Plugin {
 		);
 	}
 
+
+	/**
+	 * Callback function for displaying the email errors checkbox.
+	 */
+	public function display_email_errors_callback() {
+		$option = get_option( 'adas_quote_display_email_errors' );
+		echo '<input type="checkbox" name="adas_quote_display_email_errors" value="1" ' . checked( 1, $option, false ) . '>';
+	}
 	/**
 	 * Callback function for displaying the email subject input field.
 	 */
-	function email_subject_callback() {
+	public function email_subject_callback() {
 		$option = get_option( 'adas_quote_email_subject' );
 		echo '<input style="width: 300px;" type="text" name="adas_quote_email_subject" value="' . esc_attr( $option ) . '">';
 	}
@@ -250,7 +316,7 @@ class ADAS_Quote_Plugin {
 	/**
 	 * Callback function for displaying the Gmail SMTP Username input field.
 	 */
-	function gmail_smtp_username_callback() {
+	public function gmail_smtp_username_callback() {
 		$option = get_option( 'adas_quote_gmail_smtp_username' );
 		echo '<input type="text" name="adas_quote_gmail_smtp_username" value="' . esc_attr( $option ) . '" />';
 	}
@@ -258,11 +324,17 @@ class ADAS_Quote_Plugin {
 	/**
 	 * Callback function for displaying the Gmail SMTP Password input field.
 	 */
-	function gmail_smtp_password_callback() {
+	public function gmail_smtp_password_callback() {
 		$option = get_option( 'adas_quote_gmail_smtp_password' );
 		echo '<input type="text" name="adas_quote_gmail_smtp_password" value="' . esc_attr( $option ) . '" />';
 	}
 
+	/**
+	 * Sanitize the input values.
+	 *
+	 * @param array $input The input values.
+	 * @return array The sanitized input values.
+	 */
 	public function sanitize( $input ) {
 		$new_input = array();
 		if ( isset( $input['enable_quote'] ) ) {
@@ -271,8 +343,11 @@ class ADAS_Quote_Plugin {
 		return $new_input;
 	}
 
+		/**
+		 * Display the section info.
+		 */
 	public function section_info() {
-		// translators: %s: Plugin name
+		// translators: %s: Plugin name.
 		printf(
 			'<p>%s</p>',
 			esc_html__(
@@ -284,6 +359,9 @@ class ADAS_Quote_Plugin {
 		);
 	}
 
+	/**
+	 * Callback function for displaying the enable quote checkbox.
+	 */
 	public function enable_quote_callback() {
 		$options = get_option( 'adas_quote_options' );
 		$checked = isset( $options['enable_quote'] ) ? 'checked' : '';
@@ -293,8 +371,11 @@ class ADAS_Quote_Plugin {
 		);
 	}
 
+	/**
+	 * Callback function for displaying the settings section description.
+	 */
 	public function settings_section_callback() {
-		echo '<p>Configure settings for ADAS Quote plugin.</p>';
+		echo '';
 	}
 
 	/**
@@ -304,7 +385,10 @@ class ADAS_Quote_Plugin {
 		echo '<p>Configure SMTP settings for sending emails.</p>';
 	}
 
-	function selected_categories_callback() {
+	/**
+	 * Callback function for displaying the selected categories dropdown.
+	 */
+	public function selected_categories_callback() {
 		global $wp_query;
 
 		$current_product_cat = isset( $wp_query->query['product_cat'] ) ? $wp_query->query['product_cat'] : '';
@@ -345,7 +429,7 @@ class ADAS_Quote_Plugin {
 	/**
 	 * Callback function for displaying the admin email input field.
 	 */
-	function admin_email_callback() {
+	public function admin_email_callback() {
 		$option = get_option( 'adas_quote_admin_email' );
 		if ( empty( $option ) ) {
 			$option = get_option( 'admin_email' );
@@ -356,14 +440,13 @@ class ADAS_Quote_Plugin {
 		/**
 		 * Callback function for displaying the selected products in a multi-select dropdown.
 		 */
-	function selected_products_callback() {
-		// $selected_products = get_option( 'adas_quote_selected_products', array() );
+	public function selected_products_callback() {
 		$selected_products_option = get_option( 'adas_quote_selected_products', array() );
 
-		// Ensure $selected_products is always an array
+		// Ensure $selected_products is always an array.
 		$selected_products = is_array( $selected_products_option ) ? $selected_products_option : array();
 
-		// Only apply array_map if $selected_products is not empty
+		// Only apply array_map if $selected_products is not empty.
 		$selected_products = ! empty( $selected_products ) ? array_flip( array_map( 'intval', $selected_products ) ) : array();
 
 		error_log( 'Selected products: ' . print_r( $selected_products, true ) );
@@ -393,7 +476,7 @@ class ADAS_Quote_Plugin {
 			error_log( "Product ID: $product_id, Is Selected: " . ( $is_selected ? 'Yes' : 'No' ) );
 			printf(
 				'<option value="%d" %s>%s</option>',
-				$product_id,
+				esc_attr( $product_id ),
 				$is_selected ? 'selected' : '',
 				esc_html( $product->get_name() )
 			);
@@ -453,19 +536,22 @@ class ADAS_Quote_Plugin {
 	/**
 	 * Callback function for displaying the custom email message textarea.
 	 */
-	function adas_quote_custom_email_message_callback() {
+	public function adas_quote_custom_email_message_callback() {
 		$option = get_option( 'adas_quote_custom_email_message' );
 		echo '<textarea name="adas_quote_custom_email_message" rows="5" cols="50">' . esc_textarea( $option ) . '</textarea>';
 	}
+	/**
+	 * Callback function for displaying the custom email subject.
+	 */
 	private function display_settings_form() {
 		?>
 <form method="post" action="options.php">
-    <?php
+		<?php
 			settings_fields( 'adas_quote_settings_group' );
 			do_settings_sections( 'adas-quote-settings' );
 			submit_button();
 		?>
 </form>
-<?php
+		<?php
 	}
 }

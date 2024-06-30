@@ -17,7 +17,14 @@
 class PluginToolbox {
 
 
-
+	/**
+	 * Send an admin notification email.
+	 *
+	 * @param string $admin_email The admin email address.
+	 * @param string $customer_email The customer email address.
+	 * @param string $original_message The original message to be sent.
+	 * @return bool True if the email was sent successfully, false otherwise.
+	 */
 	private static function send_admin_notification( $admin_email, $customer_email, $original_message ) {
 		$mail = self::configure_smtp();
 
@@ -45,14 +52,24 @@ class PluginToolbox {
 
 
 
-
+	/**
+	 * Send an email for a quote request.
+	 *
+	 * @param array $data The data for the quote request.
+	 * @return bool True if the email was sent successfully, false otherwise.
+	 */
 	public static function send_email( $data ) {
+
+		delete_option( 'adas_quote_email_errors' );
+
 		if ( ! is_array( $data ) || empty( $data ) ) {
+			AQ_Error_Logger::log_error( 'Invalid or empty data' );
 			return false;
 		}
 
 		$product = wc_get_product( $data['product_id'] );
 		if ( ! $product ) {
+			AQ_Error_Logger::log_error( 'Invalid product' );
 			return false;
 		}
 
@@ -74,8 +91,11 @@ class PluginToolbox {
 		$mail = self::configure_smtp();
 
 		if ( ! $mail ) {
+			AQ_Error_Logger::log_error( 'SMTP configuration failed, falling back to wp_mail' );
 			return self::send_wp_mail( $to_send, $email_title, $message, $admin_email, $site_title );
 		}
+
+		AQ_Error_Logger::log_error( 'SMTP configured successfully, attempting to send via SMTP' );
 
 		try {
 			// Recipients.
@@ -91,20 +111,30 @@ class PluginToolbox {
 				throw new Exception( $mail->ErrorInfo );
 			}
 
+			AQ_Error_Logger::log_error( 'Email sent successfully via SMTP' );
+
 			// Send admin notification
 			$message_to_admin = '<p>' . sprintf( esc_html__( 'Quote has been sent to %s', 'AQ' ), esc_html( $to_send ) ) . '</p>';
 			$admin_notified   = self::send_admin_notification( $admin_email, $to_send, $message_to_admin );
 			if ( ! $admin_notified ) {
-				error_log( 'Failed to send admin notification' );
+				AQ_Error_Logger::log_error( 'Failed to send admin notification' );
+			} else {
+				AQ_Error_Logger::log_error( 'Admin notification sent successfully' );
 			}
 
 			return true;
 		} catch ( Exception $e ) {
+			AQ_Error_Logger::log_error( 'SMTP send failed, attempting fallback to wp_mail' );
 			self::handle_email_error( $e, $admin_email );
-			return false;
+			return self::send_wp_mail( $to_send, $email_title, $message, $admin_email, $site_title );
 		}
 	}
 
+		/**
+		 * Configure SMTP settings for PHPMailer.
+		 *
+		 * @return PHPMailer\PHPMailer\PHPMailer|false The configured PHPMailer instance, or false on failure.
+		 */
 	private static function configure_smtp() {
 		$mail = new PHPMailer\PHPMailer\PHPMailer( true );
 
@@ -112,6 +142,7 @@ class PluginToolbox {
 		$password = get_option( 'adas_quote_gmail_smtp_password' );
 
 		if ( empty( $username ) || empty( $password ) ) {
+			AQ_Error_Logger::log_error( 'SMTP credentials missing' );
 			return false;
 		}
 
@@ -124,20 +155,23 @@ class PluginToolbox {
 		$mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
 		$mail->Port       = 587;
 
+		// AQ_Error_Logger::log_error( 'SMTP configured with username: ' . $username );
+
 		return $mail;
 	}
 
 	/**
-	 * Send email using WordPress built-in mail function.
+	 * Send an email using wp_mail as a fallback.
 	 *
-	 * @param string $to The recipient's email address.
+	 * @param string $to The recipient email address.
 	 * @param string $subject The email subject.
-	 * @param string $message The email message content.
-	 * @param string $from_email The sender's email address.
-	 * @param string $from_name The sender's name.
+	 * @param string $message The email message.
+	 * @param string $from_email The sender email address.
+	 * @param string $from_name The sender name.
 	 * @return bool True if the email was sent successfully, false otherwise.
 	 */
 	private static function send_wp_mail( $to, $subject, $message, $from_email, $from_name ) {
+		AQ_Error_Logger::log_error( 'Attempting to send via wp_mail' );
 		$headers = array(
 			'Content-Type: text/html; charset=UTF-8',
 			sprintf( 'From: %s <%s>', esc_html( $from_name ), $from_email ),
@@ -146,14 +180,29 @@ class PluginToolbox {
 		$customer_email_sent = wp_mail( $to, $subject, $message, $headers );
 
 		if ( $customer_email_sent ) {
-			$admin_message = $message . '<p>' . sprintf( esc_html__( 'Quote has been sent to %s', 'AQ' ), esc_html( $to ) ) . '</p>';
-			wp_mail( $from_email, esc_html__( 'Quote Enquiry', 'AQ' ), $admin_message, $headers );
+			AQ_Error_Logger::log_error( 'Customer email sent successfully via wp_mail' );
+			$admin_message    = $message . '<p>' . sprintf( esc_html__( 'Quote has been sent to %s', 'AQ' ), esc_html( $to ) ) . '</p>';
+			$admin_email_sent = wp_mail( $from_email, esc_html__( 'Quote Enquiry', 'AQ' ), $admin_message, $headers );
+			if ( $admin_email_sent ) {
+				AQ_Error_Logger::log_error( 'Admin notification sent successfully via wp_mail' );
+			} else {
+				AQ_Error_Logger::log_error( 'Failed to send admin notification via wp_mail' );
+			}
 			return true;
 		}
 
+		AQ_Error_Logger::log_error( 'Failed to send customer email via wp_mail' );
 		return false;
 	}
 
+
+
+	/**
+	 * Handle email errors and log them.
+	 *
+	 * @param Exception $exception The exception thrown during email sending.
+	 * @param string    $admin_email The admin email address.
+	 */
 	private static function handle_email_error( $exception, $admin_email ) {
 		$error_message = $exception->getMessage();
 		$log_message   = '';
@@ -235,7 +284,7 @@ class PluginToolbox {
 					</td>
 					<td style="border: 1px solid #e5e5e5; padding: 10px;">
 						<?php
-								$variations_attr = maybe_unserialize( $data['variations_attr'] );
+							$variations_attr = maybe_unserialize( $data['variations_attr'] );
 						if ( is_array( $variations_attr ) ) {
 							foreach ( $variations_attr as $attr_name => $attr_value ) {
 								echo esc_html( $attr_name ) . ': ' . esc_html( $attr_value ) . '<br>';
@@ -252,7 +301,7 @@ class PluginToolbox {
 	</div>
 
 		<?php
-			$custom_email_message = get_option( 'adas_quote_custom_email_message' );
+		$custom_email_message = get_option( 'adas_quote_custom_email_message' );
 		if ( ! empty( $custom_email_message ) ) {
 			echo '<div style="background-color: #f8f8f8; padding: 15px; margin-top: 20px; border-left: 4px solid #0066cc;">';
 			echo wp_kses_post( nl2br( $custom_email_message ) );
