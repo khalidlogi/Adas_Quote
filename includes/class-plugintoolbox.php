@@ -16,93 +16,35 @@
  */
 class PluginToolbox {
 
-	/**
-	 * Send an email for the quote request.
-	 *
-	 * @param array $data The data for the quote request.
-	 * @return bool True if the email was sent successfully, false otherwise.
-	 */
-	// public static function send_email( $data ) {
-	// ... (previous code for data validation)
 
-	// Load PHPMailer
-	// require_once ABSPATH . WPINC . '/PHPMailer/PHPMailer.php';
-	// require_once ABSPATH . WPINC . '/PHPMailer/SMTP.php';
-	// require_once ABSPATH . WPINC . '/PHPMailer/Exception.php';
 
-	// $mail = new PHPMailer\PHPMailer\PHPMailer( true );
+	private static function send_admin_notification( $admin_email, $customer_email, $original_message ) {
+		$mail = self::configure_smtp();
 
-	// try {
-	// Server settings
-	// $mail->isSMTP();
-	// $mail->Host       = 'smtp.gmail.com'; // Replace with your SMTP server
-	// $mail->SMTPAuth   = true;
-	// $mail->Username   = 'khalidlogi2@gmail.com'; // Replace with your SMTP username
-	// $mail->Password   = 'gnml shyn qhwj cvha'; // Replace with your SMTP password
-	// $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-	// $mail->Port       = 25;
+		if ( ! $mail ) {
+			return false;
+		}
 
-	// Recipients
-	// $mail->setFrom( $admin_email, $site_title );
-	// $mail->addAddress( $to_send );
+		try {
+			$mail->setFrom( $admin_email, get_bloginfo( 'name' ) );
+			$mail->addAddress( $admin_email );
 
-	// Content
-	// $mail->isHTML( true );
-	// $mail->Subject = $email_title;
-	// $mail->Body    = $message;
+			$admin_message = $original_message;
 
-	// $mail->send();
+			$mail->isHTML( true );
+			$mail->Subject = __( 'Quote Enquiry', 'AQ' );
+			$mail->Body    = $admin_message;
 
-	// Send admin notification
-	// $mail->clearAddresses();
-	// $mail->addAddress( $admin_email );
-	// $mail->Subject = __( 'Quote Enquiry', 'AQ' );
-	// $mail->Body    = $admin_message;
-	// $mail->send();
+			$mail->send();
+			return true;
+		} catch ( Exception $e ) {
+			error_log( 'Admin Notification Error: ' . $mail->ErrorInfo );
+			return false;
+		}
+	}
 
-	// return true;
-	// } catch ( Exception $e ) {
-	// error_log( "Message could not be sent. Mailer Error: {$mail->ErrorInfo}" );
-	// return false;
-	// }
-	// }
 
-	// public static function send_email( $data ) {
-	// if ( ! is_array( $data ) || empty( $data ) ) {
-	// return false;
-	// }
 
-	// $product = wc_get_product( $data['product_id'] );
-	// if ( ! $product ) {
-	// return false;
-	// }
-
-	// $message = self::generate_email_body( $data, $product );
-
-	// $quote_admin_email = get_option( 'wc_settings_quote_admin_email' );
-	// $admin_email       = $quote_admin_email ? sanitize_email( $quote_admin_email ) : get_option( 'admin_email' );
-	// $site_title        = get_bloginfo( 'name' );
-	// $to_send           = sanitize_email( $data['user_email'] );
-
-	// $headers = array(
-	// 'Content-Type: text/html; charset=UTF-8',
-	// sprintf( 'From: %s <%s>', esc_html( $site_title ), $admin_email ),
-	// );
-
-	// $quote_email_title = get_option( 'wc_settings_quote_email_subject', __( 'Quote', 'AQ' ) );
-	// $email_title       = sanitize_text_field( $quote_email_title );
-
-	// $customer_email_sent = wp_mail( $to_send, $email_title, $message, $headers );
-
-	// if ( $customer_email_sent ) {
-	// Translators: %s is the email address to which the quote has been sent.
-	// $admin_message = $message . '<p>' . sprintf( esc_html__( 'Quote has been sent to %s', 'AQ' ), esc_html( $to_send ) ) . '</p>';
-	// wp_mail( $admin_email, esc_html__( 'Quote Enquiry', 'AQ' ), $admin_message, $headers );
-	// return true;
-	// } else {
-	// return false;
-	// }
-	// }
 
 	public static function send_email( $data ) {
 		if ( ! is_array( $data ) || empty( $data ) ) {
@@ -116,12 +58,12 @@ class PluginToolbox {
 
 		$message = self::generate_email_body( $data, $product );
 
-		$quote_admin_email = get_option( 'wc_settings_quote_admin_email' );
+		$quote_admin_email = get_option( 'adas_quote_admin_email' );
 		$admin_email       = $quote_admin_email ? sanitize_email( $quote_admin_email ) : get_option( 'admin_email' );
 		$site_title        = get_bloginfo( 'name' );
 		$to_send           = sanitize_email( $data['user_email'] );
 
-		$quote_email_title = get_option( 'wc_settings_quote_email_subject', __( 'Quote', 'AQ' ) );
+		$quote_email_title = get_option( 'adas_quote_email_subject', __( 'Quote', 'AQ' ) );
 		$email_title       = sanitize_text_field( $quote_email_title );
 
 		// Load PHPMailer
@@ -129,63 +71,118 @@ class PluginToolbox {
 		require_once ABSPATH . WPINC . '/PHPMailer/SMTP.php';
 		require_once ABSPATH . WPINC . '/PHPMailer/Exception.php';
 
-		$mail = new PHPMailer\PHPMailer\PHPMailer( true );
+		$mail = self::configure_smtp();
+
+		if ( ! $mail ) {
+			return self::send_wp_mail( $to_send, $email_title, $message, $admin_email, $site_title );
+		}
 
 		try {
-			// Server settings
-			$mail->isSMTP();
-			$mail->Host     = 'smtp.gmail.com'; // Replace with your SMTP server
-			$mail->SMTPAuth = true;
-
-			$mail->Username = get_option( 'adas_quote_gmail_smtp_username' );
-			$mail->Password = get_option( 'adas_quote_gmail_smtp_password' );
-
-			$mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-			$mail->Port       = 587;
-
-			// Recipients
+			// Recipients.
 			$mail->setFrom( $admin_email, $site_title );
 			$mail->addAddress( $to_send );
 
-			if ( empty( $mail->Username ) || empty( $mail->Password ) ) {
-				// Fallback to wp_mail if SMTP credentials are not set.
-				$headers = array(
-					'Content-Type: text/html; charset=UTF-8',
-					sprintf( 'From: %s <%s>', esc_html( $site_title ), $admin_email ),
-				);
-
-				$customer_email_sent = wp_mail( $to_send, $email_title, $message, $headers );
-
-				if ( $customer_email_sent ) {
-					$admin_message = $message . '<p>' . sprintf( esc_html__( 'Quote has been sent to %s', 'AQ' ), esc_html( $to_send ) ) . '</p>';
-					wp_mail( $admin_email, esc_html__( 'Quote Enquiry', 'AQ' ), $admin_message, $headers );
-					return true;
-				} else {
-					return false;
-				}
-			}
-
-			// Content
+			// Content.
 			$mail->isHTML( true );
 			$mail->Subject = $email_title;
 			$mail->Body    = $message;
 
-			$mail->send();
+			if ( ! $mail->send() ) {
+				throw new Exception( $mail->ErrorInfo );
+			}
 
 			// Send admin notification
-			$admin_message = $message . '<p>' . sprintf( esc_html__( 'Quote has been sent to %s', 'AQ' ), esc_html( $to_send ) ) . '</p>';
-			$mail->clearAddresses();
-			$mail->addAddress( $admin_email );
-			$mail->Subject = __( 'Quote Enquiry', 'AQ' );
-			$mail->Body    = $admin_message;
-			$mail->send();
+			$message_to_admin = '<p>' . sprintf( esc_html__( 'Quote has been sent to %s', 'AQ' ), esc_html( $to_send ) ) . '</p>';
+			$admin_notified   = self::send_admin_notification( $admin_email, $to_send, $message_to_admin );
+			if ( ! $admin_notified ) {
+				error_log( 'Failed to send admin notification' );
+			}
 
 			return true;
 		} catch ( Exception $e ) {
-			error_log( "Message could not be sent. Mailer Error: {$mail->ErrorInfo}" );
+			self::handle_email_error( $e, $admin_email );
 			return false;
 		}
 	}
+
+	private static function configure_smtp() {
+		$mail = new PHPMailer\PHPMailer\PHPMailer( true );
+
+		$username = get_option( 'adas_quote_gmail_smtp_username' );
+		$password = get_option( 'adas_quote_gmail_smtp_password' );
+
+		if ( empty( $username ) || empty( $password ) ) {
+			return false;
+		}
+
+		// Server settings.
+		$mail->isSMTP();
+		$mail->Host       = 'smtp.gmail.com';
+		$mail->SMTPAuth   = true;
+		$mail->Username   = $username;
+		$mail->Password   = $password;
+		$mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+		$mail->Port       = 587;
+
+		return $mail;
+	}
+
+	/**
+	 * Send email using WordPress built-in mail function.
+	 *
+	 * @param string $to The recipient's email address.
+	 * @param string $subject The email subject.
+	 * @param string $message The email message content.
+	 * @param string $from_email The sender's email address.
+	 * @param string $from_name The sender's name.
+	 * @return bool True if the email was sent successfully, false otherwise.
+	 */
+	private static function send_wp_mail( $to, $subject, $message, $from_email, $from_name ) {
+		$headers = array(
+			'Content-Type: text/html; charset=UTF-8',
+			sprintf( 'From: %s <%s>', esc_html( $from_name ), $from_email ),
+		);
+
+		$customer_email_sent = wp_mail( $to, $subject, $message, $headers );
+
+		if ( $customer_email_sent ) {
+			$admin_message = $message . '<p>' . sprintf( esc_html__( 'Quote has been sent to %s', 'AQ' ), esc_html( $to ) ) . '</p>';
+			wp_mail( $from_email, esc_html__( 'Quote Enquiry', 'AQ' ), $admin_message, $headers );
+			return true;
+		}
+
+		return false;
+	}
+
+	private static function handle_email_error( $exception, $admin_email ) {
+		$error_message = $exception->getMessage();
+		$log_message   = '';
+
+		if ( strpos( $error_message, 'SMTP connect() failed' ) !== false ) {
+			$log_message = 'SMTP Connection Failure: ' . $error_message;
+			wp_mail( $admin_email, 'SMTP Connection Failure', $log_message );
+		} elseif ( strpos( $error_message, 'Invalid address' ) !== false ) {
+			$log_message = 'Invalid Email Address: ' . $error_message;
+		} elseif ( strpos( $error_message, 'mailbox unavailable' ) !== false ) {
+			$log_message = 'Recipient Rejection: ' . $error_message;
+		} elseif ( strpos( $error_message, 'Authorization' ) !== false ) {
+			$log_message = 'SMTP Authentication Failure: ' . $error_message;
+			wp_mail( $admin_email, 'SMTP Authentication Failure', $log_message );
+		} else {
+			$log_message = 'Email Sending Error: ' . $error_message;
+		}
+
+		error_log( $log_message );
+
+		// Store errors in a custom option for admin review
+		$current_errors   = get_option( 'adas_quote_email_errors', array() );
+		$current_errors[] = array(
+			'time'  => current_time( 'mysql' ),
+			'error' => $log_message,
+		);
+		update_option( 'adas_quote_email_errors', array_slice( $current_errors, -10 ) ); // Keep last 10 errors
+	}
+
 
 
 
@@ -203,39 +200,41 @@ class PluginToolbox {
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php esc_html_e( 'Quote Request', 'AQ' ); ?></title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title><?php esc_html_e( 'Quote Request', 'AQ' ); ?></title>
 </head>
 
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
-    <h1 style="color: #0066cc; text-align: center;"><?php esc_html_e( 'Quote Request', 'AQ' ); ?></h1>
+	<h1 style="color: #0066cc; text-align: center;"><?php esc_html_e( 'Quote Request', 'AQ' ); ?></h1>
 
-    <p style="font-size: 16px;"><?php esc_html_e( 'You have requested a quote for the following product:', 'AQ' ); ?>
-    </p>
+	<p style="font-size: 16px;"><?php esc_html_e( 'You have requested a quote for the following product:', 'AQ' ); ?>
+	</p>
 
-    <div style="width: 100%; margin: 20px auto; border: 1px solid #e5e5e5;">
-        <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr style="background-color: #f8f8f8;">
-                    <th style="width: 33.33%; text-align: left; border: 1px solid #e5e5e5; padding: 10px;">
-                        <?php esc_html_e( 'Product Title', 'AQ' ); ?></th>
-                    <th style="width: 33.33%; text-align: left; border: 1px solid #e5e5e5; padding: 10px;">
-                        <?php esc_html_e( 'Product Variation', 'AQ' ); ?></th>
-                    <th style="width: 33.33%; text-align: left; border: 1px solid #e5e5e5; padding: 10px;">
-                        <?php esc_html_e( 'Product Quantity', 'AQ' ); ?></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td style="border: 1px solid #e5e5e5; padding: 10px;">
-                        <?php echo esc_html( $product->get_name() ); ?>
-                        <?php if ( ! empty( $data['variation_id'] ) ) : ?>
-                        <br><small><?php echo esc_html( get_post_meta( $data['variation_id'], 'attribute_size', true ) ); ?></small>
-                        <?php endif; ?>
-                    </td>
-                    <td style="border: 1px solid #e5e5e5; padding: 10px;">
-                        <?php
+	<div style="width: 100%; margin: 20px auto; border: 1px solid #e5e5e5;">
+		<table style="width: 100%; border-collapse: collapse;">
+			<thead>
+				<tr style="background-color: #f8f8f8;">
+					<th style="width: 33.33%; text-align: left; border: 1px solid #e5e5e5; padding: 10px;">
+						<?php esc_html_e( 'Product Title', 'AQ' ); ?></th>
+					<?php if ( ! empty( $data['variation_id'] ) ) : ?>
+					<th style="width: 25%; text-align: left; border: 1px solid #e5e5e5; padding: 10px;">
+						<?php esc_html_e( 'Product Variation', 'AQ' ); ?></th>
+					<?php endif; ?>
+					<th style="width: 33.33%; text-align: left; border: 1px solid #e5e5e5; padding: 10px;">
+						<?php esc_html_e( 'Product Quantity', 'AQ' ); ?></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td style="border: 1px solid #e5e5e5; padding: 10px;">
+						<?php echo esc_html( $product->get_name() ); ?>
+						<?php if ( ! empty( $data['variation_id'] ) ) : ?>
+						<br><small><?php echo esc_html( get_post_meta( $data['variation_id'], 'attribute_size', true ) ); ?></small>
+						<?php endif; ?>
+					</td>
+					<td style="border: 1px solid #e5e5e5; padding: 10px;">
+						<?php
 								$variations_attr = maybe_unserialize( $data['variations_attr'] );
 						if ( is_array( $variations_attr ) ) {
 							foreach ( $variations_attr as $attr_name => $attr_value ) {
@@ -243,16 +242,16 @@ class PluginToolbox {
 							}
 						}
 						?>
-                    </td>
-                    <td style="border: 1px solid #e5e5e5; padding: 10px;">
-                        <?php echo esc_html( $data['product_quantity'] ); ?>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+					</td>
+					<td style="border: 1px solid #e5e5e5; padding: 10px;">
+						<?php echo esc_html( $data['product_quantity'] ); ?>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 
-    <?php
+		<?php
 			$custom_email_message = get_option( 'adas_quote_custom_email_message' );
 		if ( ! empty( $custom_email_message ) ) {
 			echo '<div style="background-color: #f8f8f8; padding: 15px; margin-top: 20px; border-left: 4px solid #0066cc;">';
@@ -261,18 +260,18 @@ class PluginToolbox {
 		}
 		?>
 
-    <p style="margin-top: 20px; font-style: italic;">
-        <?php esc_html_e( 'Thank you for your interest. We will review your quote request and get back to you shortly.', 'AQ' ); ?>
-    </p>
+	<p style="margin-top: 20px; font-style: italic;">
+		<?php esc_html_e( 'Thank you for your interest. We will review your quote request and get back to you shortly.', 'AQ' ); ?>
+	</p>
 
-    <div style="margin-top: 30px; text-align: center; font-size: 12px; color: #666;">
-        <p><?php echo esc_html( get_bloginfo( 'name' ) ); ?></p>
-        <p><?php echo esc_html( get_bloginfo( 'description' ) ); ?></p>
-    </div>
+	<div style="margin-top: 30px; text-align: center; font-size: 12px; color: #666;">
+		<p><?php echo esc_html( get_bloginfo( 'name' ) ); ?></p>
+		<p><?php echo esc_html( get_bloginfo( 'description' ) ); ?></p>
+	</div>
 </body>
 
 </html>
-<?php
+		<?php
 		return ob_get_clean();
 	}
 

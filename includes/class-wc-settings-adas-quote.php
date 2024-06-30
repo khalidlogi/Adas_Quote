@@ -151,6 +151,10 @@ class ADAS_Quote_Plugin {
 			'adas_quote_settings_group',
 			'adas_quote_gmail_smtp_password'
 		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_email_subject'
+		);
 
 		add_settings_section(
 			'adas_quote_settings_section',
@@ -212,6 +216,14 @@ class ADAS_Quote_Plugin {
 		);
 
 		add_settings_field(
+			'adas_quote_email_subject',
+			'Email Subject',
+			array( $this, 'email_subject_callback' ),
+			'adas-quote-settings',
+			'adas_quote_settings_section'
+		);
+
+		add_settings_field(
 			'adas_quote_selected_products',
 			'Select Products for Quote Button',
 			array( $this, 'selected_products_callback' ),
@@ -225,6 +237,14 @@ class ADAS_Quote_Plugin {
 			'adas-quote-settings',
 			'adas_quote_settings_section'
 		);
+	}
+
+	/**
+	 * Callback function for displaying the email subject input field.
+	 */
+	function email_subject_callback() {
+		$option = get_option( 'adas_quote_email_subject' );
+		echo '<input style="width: 300px;" type="text" name="adas_quote_email_subject" value="' . esc_attr( $option ) . '">';
 	}
 
 	/**

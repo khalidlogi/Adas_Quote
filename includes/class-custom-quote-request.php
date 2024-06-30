@@ -18,7 +18,7 @@ class Custom_Quote_Request {
 		// Hook to enqueue scripts.
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
 
-		if ( get_option( 'adas_quote_hide_price' ) === 1 ) {
+		if ( get_option( 'adas_quote_hide_price' ) == 1 ) {
 			remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_price', 10 );
 		}
 
@@ -44,11 +44,11 @@ class Custom_Quote_Request {
 .single-product .single_add_to_cart_button,
 .single-product button.single_add_to_cart_button,
 .single-product a.single_add_to_cart_button {
-	display: none !important;
+    display: none !important;
 }
 </style>
 
-			<?php
+<?php
 		}
 	}
 
