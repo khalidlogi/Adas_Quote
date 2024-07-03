@@ -14,6 +14,8 @@
  */
 class AQ_Error_Logger {
 	/**
+	 *  * This class handles logging, retrieving, and clearing email errors for the
+	 *
 	 * @var string $option_name The name of the WordPress option where errors are stored.
 	 */
 	private static $option_name = 'adas_quote_email_errors';

@@ -38,6 +38,8 @@ class Custom_Enqueue {
 			'1.0.0'
 		);
 
+		wp_enqueue_script( 'recaptcha', 'https://www.google.com/recaptcha/api.js' );
+
 		// Enqueue Bootstrap JS.
 		wp_enqueue_script( 'bootstrap-js', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js', array( 'jquery' ), '4.5.2', true );
 	}

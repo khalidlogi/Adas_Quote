@@ -56,11 +56,19 @@ jQuery(document).ready(function ($) {
     }
 
     function handleFormSubmit(event) {
+        event.preventDefault(); // Always prevent default form submission
         console.log('Form submission initiated');
-        event.preventDefault();
+    
         clearErrorHighlights();
     
-        const formData = {
+        var recaptchaResponse = grecaptcha.getResponse();
+    
+        if (!recaptchaResponse) {
+            alert('Please complete the CAPTCHA');
+            return;
+        }
+    
+        var formData = {
             action: 'handle_quote_request',
             product_quantity: customQuoteForm.find('input[name="product_quantity"]').val(),
             product_type: customQuoteForm.find('input[name="product_type"]').val(),
@@ -72,7 +80,8 @@ jQuery(document).ready(function ($) {
             phone_number: customQuoteForm.find('input[name="phone_number"]').val(),
             variation_id: $('#quote_variation_id').val(),
             variations_attr: $('#variationsAttr').val(),
-            custom_quote_request_nonce: customQuoteForm.find('input[name="adas_quote_nonce"]').val()
+            custom_quote_request_nonce: customQuoteForm.find('input[name="adas_quote_nonce"]').val(),
+            'g-recaptcha-response': recaptchaResponse
         };
     
         console.log('Form data:', formData);
@@ -103,6 +112,7 @@ jQuery(document).ready(function ($) {
                     console.error('Quote request failed:', response.data);
                     alert('Failed to send quote request: ' + response.data);
                 }
+                grecaptcha.reset();
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 console.error('AJAX Error:', {
@@ -112,6 +122,7 @@ jQuery(document).ready(function ($) {
                     textStatus: textStatus,
                     errorThrown: errorThrown
                 });
+                grecaptcha.reset();
                 alert('An error occurred while sending the quote request. Please check the console for more details.');
             },
             complete: function() {

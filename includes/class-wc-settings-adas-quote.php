@@ -91,6 +91,9 @@ class ADAS_Quote_Plugin {
 		<?php
 	}
 
+	/**
+	 * Display a notice if WooCommerce is not installed or active.
+	 */
 	public function woocommerce_missing_notice() {
 		?>
 <div class="notice notice-error">
@@ -208,6 +211,43 @@ class ADAS_Quote_Plugin {
 			'adas_quote_display_email_errors'
 		);
 
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_enable_recaptcha'
+		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_recaptcha_secret_key'
+		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_recaptcha_site_key'
+		);
+
+		add_settings_field(
+			'adas_quote_enable_recaptcha',
+			'Enable reCAPTCHA',
+			array( $this, 'enable_recaptcha_callback' ),
+			'adas-quote-settings',
+			'adas_quote_settings_section'
+		);
+		add_settings_field(
+			'adas_quote_recaptcha_secret_key',
+			'reCAPTCHA Secret Key',
+			array( $this, 'recaptcha_secret_key_callback' ),
+			'adas-quote-settings',
+			'adas_quote_settings_section',
+			array( 'class' => 'recaptcha-field' )
+		);
+		add_settings_field(
+			'adas_quote_recaptcha_site_key',
+			'reCAPTCHA Site Key',
+			array( $this, 'recaptcha_site_key_callback' ),
+			'adas-quote-settings',
+			'adas_quote_settings_section',
+			array( 'class' => 'recaptcha-field' )
+		);
+
 		add_settings_section(
 			'adas_quote_settings_section',
 			'ADAS Quote Settings',
@@ -295,6 +335,54 @@ class ADAS_Quote_Plugin {
 			'adas-quote-settings',
 			'adas_quote_settings_section'
 		);
+
+			// Add JavaScript to hide/show reCAPTCHA fields based on the checkbox state
+			add_action(
+				'admin_footer',
+				function () {
+					?>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+	const recaptchaCheckbox = document.querySelector('input[name="adas_quote_enable_recaptcha"]');
+	const recaptchaFields = document.querySelectorAll('.recaptcha-field');
+
+	function toggleRecaptchaFields() {
+		recaptchaFields.forEach(field => {
+			field.closest('tr').style.display = recaptchaCheckbox.checked ? '' : 'none';
+		});
+	}
+
+	recaptchaCheckbox.addEventListener('change', toggleRecaptchaFields);
+	toggleRecaptchaFields(); // Initial call to set the correct state on page load
+});
+</script>
+					<?php
+				}
+			);
+	}
+
+		/**
+		 * Callback function for displaying the reCAPTCHA Site Key input field.
+		 */
+	public function recaptcha_site_key_callback() {
+		$option = get_option( 'adas_quote_recaptcha_site_key' );
+		echo '<input type="text" name="adas_quote_recaptcha_site_key" value="' . esc_attr( $option ) . '" />';
+	}
+
+	/**
+	 * Callback function for displaying the reCAPTCHA Secret Key input field.
+	 */
+	public function recaptcha_secret_key_callback() {
+		$option = get_option( 'adas_quote_recaptcha_secret_key' );
+		echo '<input type="text" name="adas_quote_recaptcha_secret_key" value="' . esc_attr( $option ) . '" />';
+	}
+
+	/**
+	 * Callback function for displaying the Enable reCAPTCHA checkbox.
+	 */
+	public function enable_recaptcha_callback() {
+		$option = get_option( 'adas_quote_enable_recaptcha' );
+		echo '<input type="checkbox" name="adas_quote_enable_recaptcha" value="1" ' . checked( 1, $option, false ) . '>';
 	}
 
 
@@ -519,7 +607,7 @@ class ADAS_Quote_Plugin {
 	/**
 	 * Callback function for displaying the hide add to cart checkbox.
 	 */
-	function hide_add_to_cart_callback() {
+	public function hide_add_to_cart_callback() {
 		$option = get_option( 'adas_quote_hide_add_to_cart' );
 		echo '<input type="checkbox" name="adas_quote_hide_add_to_cart" value="1" ' . checked( 1, $option, false ) . '>';
 	}
@@ -527,7 +615,7 @@ class ADAS_Quote_Plugin {
 	/**
 	 * Callback function for displaying the hide price checkbox.
 	 */
-	function adas_quote_show_price_callback() {
+	public function adas_quote_show_price_callback() {
 		$option = get_option( 'adas_quote_hide_price' );
 		echo '<input type="checkbox" name="adas_quote_hide_price" value="1" ' . checked( 1, $option, false ) . '>';
 	}

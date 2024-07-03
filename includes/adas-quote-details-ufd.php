@@ -137,9 +137,7 @@ class Adas_Quote_Form_Details_Ufd {
 
 		if ( empty( $result ) ) {
 			echo( 'Not valid contact form' );
-			print_r( $results, true );
-		} else {
-			print_r( $results, true );
+
 		}
 
 		// Output the HTML structure to display the form details.
@@ -153,8 +151,7 @@ class Adas_Quote_Form_Details_Ufd {
 			'<div class="adas-form-details-wrapper">' .
 			'<div id="welcome-panel" class="cfdb7-panel">' .
 			'<div class="cfdb7-panel-content">' .
-			'<div class="welcome-panel-column-container">' .
-			'<h3> Form ID: <span id="form-id">' . esc_html( $product_id ) . '</span></h3>';
+			'<div class="welcome-panel-column-container">';
 
 		if ( ! empty( $product_name ) ) {
 			echo '<div class="title-image"><p class="product_name"><b>Product Name:</b> ' . esc_html( $product_name ) . '</p>';
@@ -167,10 +164,6 @@ class Adas_Quote_Form_Details_Ufd {
 		if ( ! empty( $product_quantity ) ) {
 			echo '<p><b>Product Quantity:</b> ' . esc_html( $product_quantity ) . '</p>';
 		}
-
-		// if ( ! empty( $useremail ) ) {
-		// echo '<p><b>Email :</b> ' . esc_html( $useremail ) . '</p>';
-		// }
 
 		if ( ! empty( $phone_number ) ) {
 			echo '<p><b>Phone Number:</b> ' . esc_html( $phone_number ) . '</p>';
@@ -188,9 +181,6 @@ class Adas_Quote_Form_Details_Ufd {
 			echo '<p><b>Submission Date:</b> ' . esc_html( $date_submitted ) . '</p>';
 		}
 
-		// if ( ! empty( $read_status ) ) {
-		// echo '<p><b>Read Status:</b> ' . esc_html( $read_status ) . '</p>';
-		// }
 		if ( ( $results ) ) {
 			$form_data = ( $results );
 		}
