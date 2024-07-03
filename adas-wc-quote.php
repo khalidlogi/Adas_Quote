@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Adas Quote for WC
- * Description: Display Quote for quotes.
+ * Description: Request a Quote for WooCommerce.
  * Version: 1.0.0
  * Author: Khalidlogi
  * Text Domain: adas_quote_request

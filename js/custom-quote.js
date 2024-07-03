@@ -61,13 +61,6 @@ jQuery(document).ready(function ($) {
     
         clearErrorHighlights();
     
-        var recaptchaResponse = grecaptcha.getResponse();
-    
-        if (!recaptchaResponse) {
-            alert('Please complete the CAPTCHA');
-            return;
-        }
-    
         var formData = {
             action: 'handle_quote_request',
             product_quantity: customQuoteForm.find('input[name="product_quantity"]').val(),
@@ -84,6 +77,16 @@ jQuery(document).ready(function ($) {
             'g-recaptcha-response': recaptchaResponse
         };
     
+       // Check if reCAPTCHA is enabled
+    if (typeof grecaptcha !== 'undefined' && $('.g-recaptcha').length > 0) {
+        var recaptchaResponse = grecaptcha.getResponse();
+        if (!recaptchaResponse) {
+            alert('Please complete the CAPTCHA');
+            return;
+        }
+        formData['g-recaptcha-response'] = recaptchaResponse;
+    }
+
         console.log('Form data:', formData);
     
         const errors = validateForm(formData);
@@ -112,6 +115,8 @@ jQuery(document).ready(function ($) {
                     console.error('Quote request failed:', response.data);
                     alert('Failed to send quote request: ' + response.data);
                 }
+                $('#loadingIndicator').hide();
+
                 grecaptcha.reset();
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -128,6 +133,9 @@ jQuery(document).ready(function ($) {
             complete: function() {
                 // Hide loading indicator
                 $('#loadingIndicator').hide();
+                if (typeof grecaptcha !== 'undefined' && $('.g-recaptcha').length > 0) {
+                    grecaptcha.reset();
+                }
             }
         });
     }

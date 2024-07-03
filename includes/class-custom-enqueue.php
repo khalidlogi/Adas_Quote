@@ -20,6 +20,7 @@ class Custom_Enqueue {
 		wp_enqueue_style( 'adas-quote-admin-styles', plugin_dir_url( __FILE__ ) . '../css/admin-styles.css' );
 	}
 
+
 	/**
 	 * Enqueue necessary scripts and styles for the front-end.
 	 */
@@ -38,7 +39,9 @@ class Custom_Enqueue {
 			'1.0.0'
 		);
 
-		wp_enqueue_script( 'recaptcha', 'https://www.google.com/recaptcha/api.js' );
+		if ( get_option( 'adas_quote_recaptcha_site_key' ) && get_option( 'adas_quote_recaptcha_secret_key' ) ) {
+			wp_enqueue_script( 'recaptcha', 'https://www.google.com/recaptcha/api.js' );
+		}
 
 		// Enqueue Bootstrap JS.
 		wp_enqueue_script( 'bootstrap-js', 'https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js', array( 'jquery' ), '4.5.2', true );
