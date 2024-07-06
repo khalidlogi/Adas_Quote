@@ -1,0 +1,233 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Project-Id-Version: Adas Quote for WC\n"
+"POT-Creation-Date: 2024-07-06 14:52+0100\n"
+"PO-Revision-Date: 2024-07-06 00:43+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.2\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: adas-wc-quote.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;"
+"_n_noop:1,2;_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: adas-quote-wplist.php:14
+msgid "Manage Quotes"
+msgstr ""
+
+#: adas-quote-wplist.php:15
+msgid "Adas Quotes Manager"
+msgstr ""
+
+#: adas-quote-wplist.php:105
+msgid "PRODUCT ID"
+msgstr ""
+
+#: adas-quote-wplist.php:107
+msgid "Count"
+msgstr ""
+
+#: includes/class-adas-quote-form-details.php:124
+msgctxt "Column label"
+msgid "id"
+msgstr ""
+
+#: includes/class-adas-quote-form-details.php:125
+msgctxt "Column label"
+msgid "Date"
+msgstr ""
+
+#: includes/class-adas-quote-form-details.php:126
+msgctxt "Column label"
+msgid "Read Status"
+msgstr ""
+
+#: includes/class-adas-quote-form-details.php:204
+msgctxt "List table row action"
+msgid "Details"
+msgstr ""
+
+#: includes/class-adas-quote-form-details.php:223
+msgid "Delete"
+msgstr ""
+
+#: includes/class-adas-quote-form-details.php:316
+#, php-format
+msgid "%s item"
+msgid_plural "%s items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/class-adas-quote-form-details.php:325
+#: includes/class-wc-settings-adas-quote.php:681
+msgid "&laquo;"
+msgstr ""
+
+#: includes/class-adas-quote-form-details.php:326
+#: includes/class-wc-settings-adas-quote.php:682
+msgid "&raquo;"
+msgstr ""
+
+#: includes/class-plugintoolbox.php:42 includes/class-plugintoolbox.php:200
+msgid "Quote Enquiry"
+msgstr ""
+
+#: includes/class-plugintoolbox.php:83
+msgid "Quote"
+msgstr ""
+
+#: includes/class-plugintoolbox.php:117 includes/class-plugintoolbox.php:199
+#, php-format
+msgid "Quote has been sent to %s"
+msgstr ""
+
+#: includes/class-plugintoolbox.php:285 includes/class-plugintoolbox.php:289
+msgid "Quote Request"
+msgstr ""
+
+#: includes/class-plugintoolbox.php:291
+msgid "You have requested a quote for the following product:"
+msgstr ""
+
+#: includes/class-plugintoolbox.php:299
+msgid "Product Title"
+msgstr ""
+
+#: includes/class-plugintoolbox.php:303
+msgid "Product Variation"
+msgstr ""
+
+#: includes/class-plugintoolbox.php:307
+msgid "Product Quantity"
+msgstr ""
+
+#: includes/class-plugintoolbox.php:350
+msgid ""
+"Thank you for your interest. We will review your quote request and get back "
+"to you shortly."
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:47
+msgid "Settings"
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:85
+msgid ""
+"No products found. Please create at least one product to use ADAS Quote "
+"Plugin effectively."
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:102
+msgid ""
+"ADAS Quote Plugin requires WooCommerce to be installed and active. Please "
+"install and activate WooCommerce to use this plugin."
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:300
+msgid "ADAS Quote Settings"
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:306
+msgid "SMTP Settings"
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:312
+msgid "reCAPTCHA Settings"
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:319
+msgid "Gmail SMTP Username"
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:326
+msgid "Gmail SMTP Password"
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:333
+msgid "Display Email Errors"
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:340
+msgid "Select Categories for Quote Button"
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:347
+msgid "Select Products for Quote Button"
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:354
+msgid "Hide Add To Cart Button"
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:361
+msgid "Hide Price"
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:368
+msgid "Custom Email Message"
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:375
+msgid "Email Subject"
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:382
+msgid "Admin Email"
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:389
+msgid "Enable reCAPTCHA"
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:396
+msgid "reCAPTCHA Secret Key"
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:404
+msgid "reCAPTCHA Site Key"
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:453
+msgid "Configure the reCAPTCHA settings for the quote request form."
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:526
+msgid "Configure settings for the ADAS Quote plugin."
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:585
+msgid "Select a category"
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:639
+msgid "No products found."
+msgstr ""
+
+#: includes/class-wc-settings-adas-quote.php:672
+#, php-format
+msgid "1 product"
+msgid_plural "%s products"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Plugin Name of the plugin/theme
+msgid "Adas Quote for WC"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "Request a Quote for WooCommerce."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Khalidlogi"
+msgstr ""

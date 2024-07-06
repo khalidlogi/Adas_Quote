@@ -3,6 +3,8 @@
  * Class QuoteButtonForm
  *
  * This class handles the display and functionality of the quote button form.
+ *
+ * @package AdasQuoteForWC
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -47,7 +49,7 @@ class QuoteButtonForm {
 		if ( $selected_categories_by_id ) {
 			$selected_categories_by_id = $selected_categories_by_id->term_id;
 		} else {
-			$selected_categories_by_id = null; // or handle the case where the term is not found
+			$selected_categories_by_id = null; // or handle the case where the term is not found.
 		}
 
 		// Check if the current product or its category matches the selected categories.
@@ -55,14 +57,8 @@ class QuoteButtonForm {
 		if ( in_array( $product->get_id(), (array) $selected_products )
 		|| ( strtolower( $category->name ) === strtolower( $selected_categories )
 		|| term_is_ancestor_of( $selected_categories_by_id, $category->term_id, 'product_cat' ) ) ) {
-			// print_r( "The current category '" . $category->name . "' matches the selected category which is: '" . $selected_categories . "'." );
-			// print_r( 'and the current product ID is: ' . $product->get_id() );
+
 		} else {
-			// print_r( "The current category '" . $category->name . "' does NOT matches the selected category which is: '" . $selected_categories . "'." );
-			// print_r( 'and the current product ID is: ' . $product->get_id() );
-			// echo '<br />';
-			// print_r( 'and the selected product IDs are: ' . implode( ', ', (array) $selected_products ) );
-			// echo '<br />';
 
 			return;
 		}
@@ -106,15 +102,14 @@ class QuoteButtonForm {
 		echo '<input type="hidden" name="action" value="adas_send_quote" />';
 
 		// Add reCAPTCHA.
-		if ( get_option( 'adas_quote_recaptcha_site_key' ) != ''
-		&& get_option( 'adas_quote_recaptcha_secret_key' ) != ''
-		&& get_option( 'adas_quote_enable_recaptcha' ) != '' ) {
-			echo '<div class="g-recaptcha" data-sitekey="' . get_option( 'adas_quote_recaptcha_site_key' ) . '"></div>';
+		if ( get_option( 'adas_quote_recaptcha_site_key' ) !== ''
+		&& get_option( 'adas_quote_recaptcha_secret_key' ) !== ''
+		&& get_option( 'adas_quote_enable_recaptcha' ) !== '' ) {
+			echo '<div class="g-recaptcha" data-sitekey="' . esc_attr( get_option( 'adas_quote_recaptcha_site_key' ) ) . '"></div>';
 		}
 		echo '<input type="hidden" id="adas_quote_nonce" name="adas_quote_nonce" value="' . esc_attr( wp_create_nonce( 'adas_quote_action' ) ) . '" />';
 
-		// Add loading indicator
-		// echo '<div id="loadingIndicator" style="display: none;">Loading...</div>';
+		// Add loading indicator.
 		echo '  <div id="loadingIndicator" style="display: none;">
         <i class="fas fa-spinner fa-spin"></i> Loading...
     </div>';
@@ -122,7 +117,7 @@ class QuoteButtonForm {
 		echo '</form>';
 		echo '</div>';
 
-		// Include the quote success modal
+		// Include the quote success modal.
 		include plugin_dir_path( __FILE__ ) . 'quote-success-modal.php';
 	}
 }

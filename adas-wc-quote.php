@@ -42,6 +42,13 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class_kh_woo_db.php';
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-aq-error-logger.php';
 
+// Include the i18n class file.
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-adas-quote-i18n.php';
+
+
+
+
+
 // Initialize the plugin.
 add_action( 'plugins_loaded', array( 'Custom_Quote_Request', 'init' ) );
 

@@ -45,7 +45,7 @@ class PluginToolbox {
 			$mail->send();
 			return true;
 		} catch ( Exception $e ) {
-			error_log( 'Admin Notification Error: ' . $mail->ErrorInfo );
+			// error_log( 'Admin Notification Error: ' . $mail->ErrorInfo );
 			return false;
 		}
 	}
@@ -172,27 +172,58 @@ class PluginToolbox {
 	 */
 	private static function send_wp_mail( $to, $subject, $message, $from_email, $from_name ) {
 		AQ_Error_Logger::log_error( 'Attempting to send via wp_mail' );
+
+		$to         = sanitize_email( $to );
+		$from_email = sanitize_email( $from_email );
+		$from_name  = wp_strip_all_tags( $from_name );
+
 		$headers = array(
 			'Content-Type: text/html; charset=UTF-8',
 			sprintf( 'From: %s <%s>', esc_html( $from_name ), $from_email ),
+		);
+
+		// Add an action to capture PHPMailer errors
+		add_action(
+			'wp_mail_failed',
+			function ( $wp_error ) {
+				AQ_Error_Logger::log_error( 'PHPMailer error: ' . $wp_error->get_error_message() );
+			}
 		);
 
 		$customer_email_sent = wp_mail( $to, $subject, $message, $headers );
 
 		if ( $customer_email_sent ) {
 			AQ_Error_Logger::log_error( 'Customer email sent successfully via wp_mail' );
+
+			$admin_email      = get_option( 'admin_email' ); // Use WordPress admin email.
 			$admin_message    = $message . '<p>' . sprintf( esc_html__( 'Quote has been sent to %s', 'AQ' ), esc_html( $to ) ) . '</p>';
-			$admin_email_sent = wp_mail( $from_email, esc_html__( 'Quote Enquiry', 'AQ' ), $admin_message, $headers );
+			$admin_email_sent = wp_mail( $admin_email, esc_html__( 'Quote Enquiry', 'AQ' ), $admin_message, $headers );
+
 			if ( $admin_email_sent ) {
 				AQ_Error_Logger::log_error( 'Admin notification sent successfully via wp_mail' );
+				$result['admin_email_sent'] = true;
 			} else {
 				AQ_Error_Logger::log_error( 'Failed to send admin notification via wp_mail' );
+				$result['errors'][] = 'Failed to send admin notification';
 			}
 			return true;
-		}
+		} else {
+			AQ_Error_Logger::log_error( 'Failed to send customer email via wp_mail' );
 
-		AQ_Error_Logger::log_error( 'Failed to send customer email via wp_mail' );
-		return false;
+			// Log any PHP errors.
+			$error = error_get_last();
+			if ( $error ) {
+				AQ_Error_Logger::log_error( 'PHP error: ' . print_r( $error, true ) );
+			}
+
+			// Log PHPMailer errors if available.
+			global $phpmailer;
+			if ( isset( $phpmailer ) && ! empty( $phpmailer->ErrorInfo ) ) {
+				AQ_Error_Logger::log_error( 'PHPMailer error info: ' . $phpmailer->ErrorInfo );
+			}
+
+			return false;
+		}
 	}
 
 
@@ -249,45 +280,45 @@ class PluginToolbox {
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php esc_html_e( 'Quote Request', 'AQ' ); ?></title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title><?php esc_html_e( 'Quote Request', 'AQ' ); ?></title>
 </head>
 
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
-    <h1 style="color: #0066cc; text-align: center;"><?php esc_html_e( 'Quote Request', 'AQ' ); ?></h1>
+	<h1 style="color: #0066cc; text-align: center;"><?php esc_html_e( 'Quote Request', 'AQ' ); ?></h1>
 
-    <p style="font-size: 16px;"><?php esc_html_e( 'You have requested a quote for the following product:', 'AQ' ); ?>
-    </p>
+	<p style="font-size: 16px;"><?php esc_html_e( 'You have requested a quote for the following product:', 'AQ' ); ?>
+	</p>
 
-    <div style="width: 100%; margin: 20px auto; border: 1px solid #e5e5e5;">
-        <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr style="background-color: #f8f8f8;">
-                    <th style="width: 33.33%; text-align: left; border: 1px solid #e5e5e5; padding: 10px;">
-                        <?php esc_html_e( 'Product Title', 'AQ' ); ?>
-                    </th>
-                    <?php if ( ! empty( $data['variation_id'] ) ) : ?>
-                    <th style="width: 33.33%; text-align: left; border: 1px solid #e5e5e5; padding: 10px;">
-                        <?php esc_html_e( 'Product Variation', 'AQ' ); ?>
-                    </th>
-                    <?php endif; ?>
-                    <th style="width: 33.33%; text-align: left; border: 1px solid #e5e5e5; padding: 10px;">
-                        <?php esc_html_e( 'Product Quantity', 'AQ' ); ?>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td style="border: 1px solid #e5e5e5; padding: 10px;">
-                        <?php echo esc_html( $product->get_name() ); ?>
-                        <?php if ( ! empty( $data['variation_id'] ) ) : ?>
-                        <br><small><?php echo esc_html( get_post_meta( $data['variation_id'], 'attribute_size', true ) ); ?></small>
-                        <?php endif; ?>
-                    </td>
-                    <?php if ( ! empty( $data['variation_id'] ) ) : ?>
-                    <td style="border: 1px solid #e5e5e5; padding: 10px;">
-                        <?php
+	<div style="width: 100%; margin: 20px auto; border: 1px solid #e5e5e5;">
+		<table style="width: 100%; border-collapse: collapse;">
+			<thead>
+				<tr style="background-color: #f8f8f8;">
+					<th style="width: 33.33%; text-align: left; border: 1px solid #e5e5e5; padding: 10px;">
+						<?php esc_html_e( 'Product Title', 'AQ' ); ?>
+					</th>
+					<?php if ( ! empty( $data['variation_id'] ) ) : ?>
+					<th style="width: 33.33%; text-align: left; border: 1px solid #e5e5e5; padding: 10px;">
+						<?php esc_html_e( 'Product Variation', 'AQ' ); ?>
+					</th>
+					<?php endif; ?>
+					<th style="width: 33.33%; text-align: left; border: 1px solid #e5e5e5; padding: 10px;">
+						<?php esc_html_e( 'Product Quantity', 'AQ' ); ?>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td style="border: 1px solid #e5e5e5; padding: 10px;">
+						<?php echo esc_html( $product->get_name() ); ?>
+						<?php if ( ! empty( $data['variation_id'] ) ) : ?>
+						<br><small><?php echo esc_html( get_post_meta( $data['variation_id'], 'attribute_size', true ) ); ?></small>
+						<?php endif; ?>
+					</td>
+					<?php if ( ! empty( $data['variation_id'] ) ) : ?>
+					<td style="border: 1px solid #e5e5e5; padding: 10px;">
+						<?php
 						$variations_attr = maybe_unserialize( $data['variations_attr'] );
 						if ( is_array( $variations_attr ) ) {
 							foreach ( $variations_attr as $attr_name => $attr_value ) {
@@ -295,18 +326,18 @@ class PluginToolbox {
 							}
 						}
 						?>
-                    </td>
-                    <?php endif; ?>
-                    <td style="border: 1px solid #e5e5e5; padding: 10px;">
-                        <?php echo esc_html( $data['product_quantity'] ); ?>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+					</td>
+					<?php endif; ?>
+					<td style="border: 1px solid #e5e5e5; padding: 10px;">
+						<?php echo esc_html( $data['product_quantity'] ); ?>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 
 
-    <?php
+		<?php
 		$custom_email_message = get_option( 'adas_quote_custom_email_message' );
 		if ( ! empty( $custom_email_message ) ) {
 			echo '<div style="background-color: #f8f8f8; padding: 15px; margin-top: 20px; border-left: 4px solid #0066cc;">';
@@ -315,18 +346,18 @@ class PluginToolbox {
 		}
 		?>
 
-    <p style="margin-top: 20px; font-style: italic;">
-        <?php esc_html_e( 'Thank you for your interest. We will review your quote request and get back to you shortly.', 'AQ' ); ?>
-    </p>
+	<p style="margin-top: 20px; font-style: italic;">
+		<?php esc_html_e( 'Thank you for your interest. We will review your quote request and get back to you shortly.', 'AQ' ); ?>
+	</p>
 
-    <div style="margin-top: 30px; text-align: center; font-size: 12px; color: #666;">
-        <p><?php echo esc_html( get_bloginfo( 'name' ) ); ?></p>
-        <p><?php echo esc_html( get_bloginfo( 'description' ) ); ?></p>
-    </div>
+	<div style="margin-top: 30px; text-align: center; font-size: 12px; color: #666;">
+		<p><?php echo esc_html( get_bloginfo( 'name' ) ); ?></p>
+		<p><?php echo esc_html( get_bloginfo( 'description' ) ); ?></p>
+	</div>
 </body>
 
 </html>
-<?php
+		<?php
 		return ob_get_clean();
 	}
 

@@ -20,12 +20,15 @@ class AQ_Error_Logger {
 	 */
 	private static $option_name = 'adas_quote_email_errors';
 
+
+
 	/**
 	 * Log an error message.
 	 *
 	 * This function logs an error message with the current timestamp. It keeps only the most recent 5 errors.
 	 *
 	 * @param string $error_message The error message to log.
+	 * @return array The formatted log data.
 	 */
 	public static function log_error( $error_message ) {
 		// Retrieve the current errors from the WordPress options table.
@@ -45,7 +48,59 @@ class AQ_Error_Logger {
 
 		// Update the WordPress option with the new list of errors.
 		update_option( self::$option_name, $current_errors );
+
+		// Format and return the log data.
+		return self::format_log_data( $current_errors );
 	}
+
+	/**
+	 * Format log data for display.
+	 *
+	 * @param array $log_data The log data to format.
+	 * @return string The formatted log data.
+	 */
+	public static function format_log_data( $log_data ) {
+		$formatted_output = '';
+		foreach ( $log_data as $entry ) {
+			$formatted_output .= "Time: {$entry['time']}\n";
+			$formatted_output .= 'Error: ';
+
+			// Check if the error message is JSON.
+			$decoded_error = json_decode( $entry['error'], true );
+			if ( json_last_error() === JSON_ERROR_NONE ) {
+				$formatted_output .= "\n" . self::format_json_error( $decoded_error );
+			} else {
+				$formatted_output .= $entry['error'] . "\n";
+			}
+
+			$formatted_output .= "\n";
+		}
+		return $formatted_output;
+	}
+
+	/**
+	 * Format JSON error data for display.
+	 *
+	 * This function recursively formats JSON error data for display with indentation.
+	 *
+	 * @param array $error_data The JSON error data to format.
+	 * @param int   $indent     The current indentation level (default is 0).
+	 * @return string The formatted JSON error data.
+	 */
+	private static function format_json_error( $error_data, $indent = 0 ) {
+		$output = '';
+		foreach ( $error_data as $key => $value ) {
+			$output .= str_repeat( '  ', $indent ) . "$key: ";
+			if ( is_array( $value ) ) {
+				$output .= "\n" . self::format_json_error( $value, $indent + 1 );
+			} else {
+				$output .= "$value\n";
+			}
+		}
+		return $output;
+	}
+
+
 
 	/**
 	 * Retrieve the logged errors.
