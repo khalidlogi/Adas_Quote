@@ -9,6 +9,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
+
+
+
+
+
+
 /**
  * Class Adas_Quote_I18n
  *
@@ -22,29 +28,30 @@ class Adas_Quote_I18n {
 	 * @return bool True on success, false on failure.
 	 */
 	public static function load_textdomain() {
-		return load_plugin_textdomain(
-			'adas_quote_request',
-			false,
-			dirname( plugin_basename( __FILE__ ) ) . '/languages/'
-		);
+		$plugin_rel_path = dirname( plugin_basename( __DIR__ ) ) . '/languages';
+		return load_plugin_textdomain( 'adas_quote_request', false, $plugin_rel_path );
 	}
 }
 
-// Load the plugin text domain for translation.
-// add_action( 'plugins_loaded', array( 'Adas_Quote_I18n', 'load_textdomain' ) );
+add_action( 'plugins_loaded', array( 'Adas_Quote_I18n', 'load_textdomain' ) );
 
-// Optionally, for debugging purposes only:
-// if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-	add_action(
-		'plugins_loaded',
-		function () {
-			$loaded = Adas_Quote_I18n::load_textdomain();
-			if ( $loaded ) {
-				error_log( 'Adas Quote for WC: Text domain loaded successfully' );
-			} else {
-				error_log( 'Adas Quote for WC: Failed to load text domain' );
-			}
-		},
-		11
-	);  // Priority 11 to ensure it runs after the main load_textdomain action
-	// }
+
+/*
+add_action(
+	'plugins_loaded',
+	function () {
+		$locale = determine_locale();
+		$mofile = WP_PLUGIN_DIR . '/adas-quote-for-wc/languages/adas_quote_request-' . $locale . '.mo';
+
+		error_log( 'Attempting to load MO file: ' . $mofile );
+
+		$loaded = load_textdomain( 'adas_quote_request', $mofile );
+
+		if ( $loaded ) {
+			error_log( 'Successfully loaded text domain from file' );
+		} else {
+			error_log( 'Failed to load text domain from file' );
+		}
+	},
+	0
+);*/

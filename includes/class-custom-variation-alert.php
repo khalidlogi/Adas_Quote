@@ -3,7 +3,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-define( 'AQ', 'adas_quote_request' );
+define( 'adas_quote_request', 'adas_quote_request' );
 
 class Custom_Variation_Alert {
 	public static function init() {

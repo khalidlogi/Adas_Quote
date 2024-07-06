@@ -121,9 +121,9 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 	public function get_columns() {
 		$columns = array(
 			'cb'             => '<input type="checkbox" />', // Render a checkbox instead of text.
-			'id'             => _x( 'id', 'Column label', 'AQ' ),
-			'date_submitted' => _x( 'Date', 'Column label', 'AQ' ),
-			'read_status'    => _x( 'Read Status', 'Column label', 'AQ' ),
+			'id'             => _x( 'id', 'Column label', 'adas_quote_request' ),
+			'date_submitted' => _x( 'Date', 'Column label', 'adas_quote_request' ),
+			'read_status'    => _x( 'Read Status', 'Column label', 'adas_quote_request' ),
 		);
 
 		return $columns;
@@ -201,7 +201,7 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 			'<a href="%1$s&view_nonce=%2$s">%3$s</a>',
 			esc_url( add_query_arg( $view_query_args, 'admin.php' ) ),
 			esc_attr( $view_nonce ),
-			_x( 'Details', 'List table row action', 'AQ' )
+			_x( 'Details', 'List table row action', 'adas_quote_request' )
 		);
 
 		// Return the id contents.

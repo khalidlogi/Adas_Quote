@@ -2,7 +2,7 @@
 /**
  * AQ_Error_Logger Class
  *
- * This file contains the AQ_Error_Logger class which handles logging, retrieving, and clearing email errors for the ADAS Quote Plugin.
+ * This file contains the AQ_Error_Logger class which handles logging, retrieving, and clearing email errors for the Adas Quote Plugin.
  *
  * @package   AdasQuoteForWc
  */
@@ -10,7 +10,7 @@
 /**
  * Class AQ_Error_Logger
  *
- * This class handles logging, retrieving, and clearing email errors for the ADAS Quote Plugin.
+ * This class handles logging, retrieving, and clearing email errors for the Adas Quote Plugin.
  */
 class AQ_Error_Logger {
 	/**
@@ -60,6 +60,8 @@ class AQ_Error_Logger {
 	 * @return string The formatted log data.
 	 */
 	public static function format_log_data( $log_data ) {
+		error_log( '$log_data : ' . print_r( $log_data, true ) );
+		error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
 		$formatted_output = '';
 		foreach ( $log_data as $entry ) {
 			$formatted_output .= "Time: {$entry['time']}\n";

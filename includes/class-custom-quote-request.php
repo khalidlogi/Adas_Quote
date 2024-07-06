@@ -3,7 +3,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'AQ', 'adas_quote_request' );
+define( 'adas_quote_request', 'adas_quote_request' );
 
 /**
  * Class Custom_Quote_Request
@@ -44,11 +44,11 @@ class Custom_Quote_Request {
 .single-product .single_add_to_cart_button,
 .single-product button.single_add_to_cart_button,
 .single-product a.single_add_to_cart_button {
-    display: none !important;
+	display: none !important;
 }
 </style>
 
-<?php
+			<?php
 		}
 	}
 
@@ -125,8 +125,8 @@ class Custom_Quote_Request {
 
 			$recaptcha_secret   = get_option( 'adas_quote_recaptcha_secret_key' );
 			$recaptcha_response = $_POST['g-recaptcha-response'];
-			error_log('$recaptcha_response: ' . print_r($recaptcha_response, true)); 
-			error_log('in ' . __FILE__ . ' on line ' . __LINE__); 
+			error_log( '$recaptcha_response: ' . print_r( $recaptcha_response, true ) );
+			error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
 
 			$verify_response = wp_remote_get(
 				"https://www.google.com/recaptcha/api/siteverify?secret=$recaptcha_secret&response=$recaptcha_response"

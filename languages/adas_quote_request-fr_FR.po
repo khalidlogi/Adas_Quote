@@ -1,17 +1,17 @@
-#, fuzzy
 msgid ""
 msgstr ""
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Adas Quote for WC\n"
-"POT-Creation-Date: 2024-07-06 17:51+0100\n"
-"PO-Revision-Date: 2024-07-06 00:43+0100\n"
+"POT-Creation-Date: 2024-07-06 17:52+0100\n"
+"PO-Revision-Date: 2024-07-06 17:58+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.2\n"
 "X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Poedit-Flags-xgettext: --add-comments=translators:\n"
 "X-Poedit-WPHeader: adas-wc-quote.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -23,219 +23,226 @@ msgstr ""
 
 #: adas-quote-wplist.php:14
 msgid "Manage Quotes"
-msgstr ""
+msgstr "Gérer les devis"
 
 #: adas-quote-wplist.php:15
 msgid "Adas Quotes Manager"
-msgstr ""
+msgstr "Adas Devis Manager"
 
 #: adas-quote-wplist.php:105
 msgid "PRODUCT ID"
-msgstr ""
+msgstr "ID du produit"
 
 #: adas-quote-wplist.php:107
 msgid "Count"
-msgstr ""
+msgstr "Nb"
 
 #: includes/class-adas-quote-form-details.php:124
 msgctxt "Column label"
 msgid "id"
-msgstr ""
+msgstr "ID"
 
 #: includes/class-adas-quote-form-details.php:125
 msgctxt "Column label"
 msgid "Date"
-msgstr ""
+msgstr "Date"
 
 #: includes/class-adas-quote-form-details.php:126
 msgctxt "Column label"
 msgid "Read Status"
-msgstr ""
+msgstr "Statut de lecture"
 
 #: includes/class-adas-quote-form-details.php:204
 msgctxt "List table row action"
 msgid "Details"
-msgstr ""
+msgstr "Détails"
 
 #: includes/class-adas-quote-form-details.php:223
 msgid "Delete"
-msgstr ""
+msgstr "Supprimer"
 
 #: includes/class-adas-quote-form-details.php:316
 #, php-format
 msgid "%s item"
 msgid_plural "%s items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%s élément"
+msgstr[1] "%s éléments"
 
 #: includes/class-adas-quote-form-details.php:325
 #: includes/class-wc-settings-adas-quote.php:678
 msgid "&laquo;"
-msgstr ""
+msgstr "&laquo;"
 
 #: includes/class-adas-quote-form-details.php:326
 #: includes/class-wc-settings-adas-quote.php:679
 msgid "&raquo;"
-msgstr ""
+msgstr "&raquo;"
 
 #: includes/class-plugintoolbox.php:42 includes/class-plugintoolbox.php:200
 msgid "Quote Enquiry"
-msgstr ""
+msgstr "Demande de devis"
 
 #: includes/class-plugintoolbox.php:83
 msgid "Quote"
-msgstr ""
+msgstr "Devis"
 
 #: includes/class-plugintoolbox.php:117 includes/class-plugintoolbox.php:199
 #, php-format
 msgid "Quote has been sent to %s"
-msgstr ""
+msgstr "Le devis a été envoyé à %s"
 
 #: includes/class-plugintoolbox.php:285 includes/class-plugintoolbox.php:289
 msgid "Quote Request"
-msgstr ""
+msgstr "Demande de devis"
 
 #: includes/class-plugintoolbox.php:291
 msgid "You have requested a quote for the following product:"
-msgstr ""
+msgstr "Vous avez demandé un devis pour le produit suivant :"
 
 #: includes/class-plugintoolbox.php:299
 msgid "Product Title"
-msgstr ""
+msgstr "Titre du produit"
 
 #: includes/class-plugintoolbox.php:303
 msgid "Product Variation"
-msgstr ""
+msgstr "Variation de produit"
 
 #: includes/class-plugintoolbox.php:307
 msgid "Product Quantity"
-msgstr ""
+msgstr "Quantité de produit"
 
 #: includes/class-plugintoolbox.php:350
 msgid ""
 "Thank you for your interest. We will review your quote request and get back "
 "to you shortly."
 msgstr ""
+"Merci de votre intérêt. Nous examinerons votre demande de devis et vous "
+"reviendrons vers vous dans les plus brefs délais."
 
 #: includes/class-quote-button-form.php:116
 msgid "Add to quote"
-msgstr ""
+msgstr "Ajouter au devis "
 
 #: includes/class-wc-settings-adas-quote.php:47
 msgid "Settings"
-msgstr ""
+msgstr "Paramètres"
 
 #: includes/class-wc-settings-adas-quote.php:85
 msgid ""
 "No products found. Please create at least one product to use Adas Quote "
 "Plugin effectively."
 msgstr ""
+"Aucun produit trouvé. Veuillez créer au moins un produit pour utiliser le "
+"plugin Adas Quote efficacement."
 
 #: includes/class-wc-settings-adas-quote.php:100
 msgid ""
 "Adas Quote Plugin requires WooCommerce to be installed and active. Please "
 "install and activate WooCommerce to use this plugin."
 msgstr ""
+"Le plugin Adas Quote requiert WooCommerce pour être installé et actif. "
+"Veuillez installer et activer WooCommerce pour utiliser ce plugin."
 
 #: includes/class-wc-settings-adas-quote.php:167
 msgid "No PHPMailer errors found."
-msgstr ""
+msgstr "Aucun message d'erreur PHPMailer trouvé."
 
 #: includes/class-wc-settings-adas-quote.php:297
 msgid "Adas Quote Settings"
-msgstr ""
+msgstr "Paramètres du plugin Adas Quote"
 
 #: includes/class-wc-settings-adas-quote.php:303
 msgid "SMTP Settings"
-msgstr ""
+msgstr "Paramètres SMTP"
 
 #: includes/class-wc-settings-adas-quote.php:309
 msgid "reCAPTCHA Settings"
-msgstr ""
+msgstr "Paramètres de reCAPTCHA"
 
 #: includes/class-wc-settings-adas-quote.php:316
 msgid "Gmail SMTP Username"
-msgstr ""
+msgstr "Nom d'utilisateur SMTP de Gmail"
 
 #: includes/class-wc-settings-adas-quote.php:323
 msgid "Gmail SMTP Password"
-msgstr ""
+msgstr "Mot de passe SMTP de Gmail"
 
 #: includes/class-wc-settings-adas-quote.php:330
 msgid "Display Email Errors"
-msgstr ""
+msgstr "Afficher les erreurs de courriel"
 
 #: includes/class-wc-settings-adas-quote.php:337
 msgid "Select Categories for Quote Button"
-msgstr ""
+msgstr "Sélectionner les catégories pour le bouton de devis"
 
 #: includes/class-wc-settings-adas-quote.php:344
 msgid "Select Products for Quote Button"
-msgstr ""
+msgstr "Sélectionner les produits pour le bouton de devis"
 
 #: includes/class-wc-settings-adas-quote.php:351
 msgid "Hide Add To Cart Button"
-msgstr ""
+msgstr "Masquer le bouton Ajouter au panier"
 
 #: includes/class-wc-settings-adas-quote.php:358
 msgid "Hide Price"
-msgstr ""
+msgstr "Masquer le prix"
 
 #: includes/class-wc-settings-adas-quote.php:365
 msgid "Custom Email Message"
-msgstr ""
+msgstr "Message de courriel personnalisé"
 
 #: includes/class-wc-settings-adas-quote.php:372
 msgid "Email Subject"
-msgstr ""
+msgstr "Objet du courriel"
 
 #: includes/class-wc-settings-adas-quote.php:379
 msgid "Admin Email"
-msgstr ""
+msgstr "Adresse de courriel de l'administrateur"
 
 #: includes/class-wc-settings-adas-quote.php:386
 msgid "Enable reCAPTCHA"
-msgstr ""
+msgstr "Activer reCAPTCHA"
 
 #: includes/class-wc-settings-adas-quote.php:393
 msgid "reCAPTCHA Secret Key"
-msgstr ""
+msgstr "clé secrète reCAPTCHA"
 
 #: includes/class-wc-settings-adas-quote.php:401
 msgid "reCAPTCHA Site Key"
-msgstr ""
+msgstr "Clé de site reCAPTCHA"
 
 #: includes/class-wc-settings-adas-quote.php:450
 msgid "Configure the reCAPTCHA settings for the quote request form."
 msgstr ""
+"Configurer les paramètres reCAPTCHA pour le formulaire de demande de devis."
 
 #: includes/class-wc-settings-adas-quote.php:523
 msgid "Configure settings for the Adas Quote plugin."
-msgstr ""
+msgstr "Configurer les paramètres pour le plugin Adas Quote."
 
 #: includes/class-wc-settings-adas-quote.php:582
 msgid "Select a category"
-msgstr ""
+msgstr "Sélectionner une catégorie"
 
 #: includes/class-wc-settings-adas-quote.php:636
 msgid "No products found."
-msgstr ""
+msgstr "Aucun produit trouvé."
 
 #: includes/class-wc-settings-adas-quote.php:669
 #, php-format
 msgid "1 product"
 msgid_plural "%s products"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "1 produit"
+msgstr[1] "%s produits"
 
 #. Plugin Name of the plugin/theme
 msgid "Adas Quote for WC"
-msgstr ""
+msgstr "Adas Quote for WC"
 
 #. Description of the plugin/theme
 msgid "Request a Quote for WooCommerce."
-msgstr ""
+msgstr "Demandez un devis pour WooCommerce."
 
 #. Author of the plugin/theme
 msgid "Khalidlogi"
-msgstr ""
+msgstr "Khalidlogi"

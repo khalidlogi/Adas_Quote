@@ -39,7 +39,7 @@ class PluginToolbox {
 			$admin_message = $original_message;
 
 			$mail->isHTML( true );
-			$mail->Subject = __( 'Quote Enquiry', 'AQ' );
+			$mail->Subject = __( 'Quote Enquiry', 'adas_quote_request' );
 			$mail->Body    = $admin_message;
 
 			$mail->send();
@@ -80,7 +80,7 @@ class PluginToolbox {
 		$site_title        = get_bloginfo( 'name' );
 		$to_send           = sanitize_email( $data['user_email'] );
 
-		$quote_email_title = get_option( 'adas_quote_email_subject', __( 'Quote', 'AQ' ) );
+		$quote_email_title = get_option( 'adas_quote_email_subject', __( 'Quote', 'adas_quote_request' ) );
 		$email_title       = sanitize_text_field( $quote_email_title );
 
 		// Load PHPMailer.
@@ -95,7 +95,7 @@ class PluginToolbox {
 			return self::send_wp_mail( $to_send, $email_title, $message, $admin_email, $site_title );
 		}
 
-		AQ_Error_Logger::log_error( 'SMTP configured successfully, attempting to send via SMTP' );
+		// AQ_Error_Logger::log_error( 'SMTP configured successfully, attempting to send via SMTP' );
 
 		try {
 			// Recipients.
@@ -114,7 +114,7 @@ class PluginToolbox {
 			AQ_Error_Logger::log_error( 'Email sent successfully via SMTP' );
 
 			// Send admin notification.
-			$message_to_admin = '<p>' . sprintf( esc_html__( 'Quote has been sent to %s', 'AQ' ), esc_html( $to_send ) ) . '</p>';
+			$message_to_admin = '<p>' . sprintf( esc_html__( 'Quote has been sent to %s', 'adas_quote_request' ), esc_html( $to_send ) ) . '</p>';
 			$admin_notified   = self::send_admin_notification( $admin_email, $to_send, $message_to_admin );
 			if ( ! $admin_notified ) {
 				AQ_Error_Logger::log_error( 'Failed to send admin notification' );
@@ -186,7 +186,7 @@ class PluginToolbox {
 		add_action(
 			'wp_mail_failed',
 			function ( $wp_error ) {
-				AQ_Error_Logger::log_error( 'PHPMailer error: ' . $wp_error->get_error_message() );
+				AQ_Error_Logger::log_error( 'PHPMailer log: ' . $wp_error->get_error_message() );
 			}
 		);
 
@@ -196,8 +196,8 @@ class PluginToolbox {
 			AQ_Error_Logger::log_error( 'Customer email sent successfully via wp_mail' );
 
 			$admin_email      = get_option( 'admin_email' ); // Use WordPress admin email.
-			$admin_message    = $message . '<p>' . sprintf( esc_html__( 'Quote has been sent to %s', 'AQ' ), esc_html( $to ) ) . '</p>';
-			$admin_email_sent = wp_mail( $admin_email, esc_html__( 'Quote Enquiry', 'AQ' ), $admin_message, $headers );
+			$admin_message    = $message . '<p>' . sprintf( esc_html__( 'Quote has been sent to %s', 'adas_quote_request' ), esc_html( $to ) ) . '</p>';
+			$admin_email_sent = wp_mail( $admin_email, esc_html__( 'Quote Enquiry', 'adas_quote_request' ), $admin_message, $headers );
 
 			if ( $admin_email_sent ) {
 				AQ_Error_Logger::log_error( 'Admin notification sent successfully via wp_mail' );
@@ -213,7 +213,7 @@ class PluginToolbox {
 			// Log any PHP errors.
 			$error = error_get_last();
 			if ( $error ) {
-				AQ_Error_Logger::log_error( 'PHP error: ' . print_r( $error, true ) );
+				AQ_Error_Logger::log_error( 'PHP log: ' . print_r( $error, true ) );
 			}
 
 			// Log PHPMailer errors if available.
@@ -282,13 +282,14 @@ class PluginToolbox {
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title><?php esc_html_e( 'Quote Request', 'AQ' ); ?></title>
+	<title><?php esc_html_e( 'Quote Request', 'adas_quote_request' ); ?></title>
 </head>
 
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
-	<h1 style="color: #0066cc; text-align: center;"><?php esc_html_e( 'Quote Request', 'AQ' ); ?></h1>
+	<h1 style="color: #0066cc; text-align: center;"><?php esc_html_e( 'Quote Request', 'adas_quote_request' ); ?></h1>
 
-	<p style="font-size: 16px;"><?php esc_html_e( 'You have requested a quote for the following product:', 'AQ' ); ?>
+	<p style="font-size: 16px;">
+		<?php esc_html_e( 'You have requested a quote for the following product:', 'adas_quote_request' ); ?>
 	</p>
 
 	<div style="width: 100%; margin: 20px auto; border: 1px solid #e5e5e5;">
@@ -296,15 +297,15 @@ class PluginToolbox {
 			<thead>
 				<tr style="background-color: #f8f8f8;">
 					<th style="width: 33.33%; text-align: left; border: 1px solid #e5e5e5; padding: 10px;">
-						<?php esc_html_e( 'Product Title', 'AQ' ); ?>
+						<?php esc_html_e( 'Product Title', 'adas_quote_request' ); ?>
 					</th>
 					<?php if ( ! empty( $data['variation_id'] ) ) : ?>
 					<th style="width: 33.33%; text-align: left; border: 1px solid #e5e5e5; padding: 10px;">
-						<?php esc_html_e( 'Product Variation', 'AQ' ); ?>
+						<?php esc_html_e( 'Product Variation', 'adas_quote_request' ); ?>
 					</th>
 					<?php endif; ?>
 					<th style="width: 33.33%; text-align: left; border: 1px solid #e5e5e5; padding: 10px;">
-						<?php esc_html_e( 'Product Quantity', 'AQ' ); ?>
+						<?php esc_html_e( 'Product Quantity', 'adas_quote_request' ); ?>
 					</th>
 				</tr>
 			</thead>
@@ -347,7 +348,7 @@ class PluginToolbox {
 		?>
 
 	<p style="margin-top: 20px; font-style: italic;">
-		<?php esc_html_e( 'Thank you for your interest. We will review your quote request and get back to you shortly.', 'AQ' ); ?>
+		<?php esc_html_e( 'Thank you for your interest. We will review your quote request and get back to you shortly.', 'adas_quote_request' ); ?>
 	</p>
 
 	<div style="margin-top: 30px; text-align: center; font-size: 12px; color: #666;">

@@ -5,6 +5,7 @@
  * Version: 1.0.0
  * Author: Khalidlogi
  * Text Domain: adas_quote_request
+ * Domain Path: /languages
  *
  * @package AdasQuoteForWC
  */

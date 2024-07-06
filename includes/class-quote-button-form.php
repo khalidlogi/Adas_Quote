@@ -113,7 +113,7 @@ class QuoteButtonForm {
 		echo '  <div id="loadingIndicator" style="display: none;">
         <i class="fas fa-spinner fa-spin"></i> Loading...
     </div>';
-		echo '<br><button type="submit" class="custom-quote-button">Add to quote</button>';
+		echo '<br><button type="submit" class="custom-quote-button">' . esc_html__( 'Add to quote', 'adas_quote_request' ) . '</button>';
 		echo '</form>';
 		echo '</div>';
 

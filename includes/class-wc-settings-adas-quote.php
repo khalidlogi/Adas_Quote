@@ -2,7 +2,7 @@
 /**
  * Class ADAS_Quote_Plugin
  *
- * This class handles the initialization and settings of the ADAS Quote Plugin.
+ * This class handles the initialization and settings of the Adas Quote Plugin.
  *
  *  @package   AdasQuoteForWC
  */
@@ -44,7 +44,7 @@ class ADAS_Quote_Plugin {
 	 * @return array Modified links.
 	 */
 	public function add_settings_link( $links ) {
-		$settings_link = '<a href="options-general.php?page=adas-quote-settings">' . __( 'Settings', 'AQ' ) . '</a>';
+		$settings_link = '<a href="options-general.php?page=adas-quote-settings">' . __( 'Settings', 'adas_quote_request' ) . '</a>';
 		array_unshift( $links, $settings_link );
 		return $links;
 	}
@@ -79,18 +79,16 @@ class ADAS_Quote_Plugin {
 	public function no_products_notice() {
 		?>
 <div class="notice notice-warning">
-    <p>
-        <?php
+	<p>
+		<?php
 		esc_html_e(
-			'No products found. Please create at least one product to use ADAS Quote Plugin effectively.',
-			'ADAS Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.
-
-'
+			'No products found. Please create at least one product to use Adas Quote Plugin effectively.',
+			'adas_quote_request'
 		);
 		?>
-    </p>
+	</p>
 </div>
-<?php
+		<?php
 	}
 
 	/**
@@ -99,10 +97,10 @@ class ADAS_Quote_Plugin {
 	public function woocommerce_missing_notice() {
 		?>
 <div class="notice notice-error">
-    <p><?php esc_html_e( 'ADAS Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.', 'AQ' ); ?>
-    </p>
+	<p><?php esc_html_e( 'Adas Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.', 'adas_quote_request' ); ?>
+	</p>
 </div>
-<?php
+		<?php
 	}
 
 	/**
@@ -111,7 +109,7 @@ class ADAS_Quote_Plugin {
 	public function create_admin_page() {
 		?>
 <div class="wrap">
-    <?php
+		<?php
 		if ( ! $this->check_woocommerce() ) {
 			$this->woocommerce_missing_notice();
 		} elseif ( ! $this->check_products_exist() ) {
@@ -124,12 +122,12 @@ class ADAS_Quote_Plugin {
 		// Display email errors if the checkbox is checked.
 		$display_errors = get_option( 'adas_quote_display_email_errors' );
 		if ( ! empty( $display_errors ) ) {
-			$this->display_email_errors();
+			$this->render_email_errors();
 		}
 
 		?>
 </div>
-<?php
+		<?php
 	}
 
 	/**
@@ -138,43 +136,110 @@ class ADAS_Quote_Plugin {
 	/**
 	 * Display email errors from the logs.
 	 */
+	// private function display_email_errors() {
+	// $errors           = get_option( 'adas_quote_email_errors', array() );
+	// $phpmailer_errors = array();
+
+	// if ( ! empty( $errors ) ) {
+	// Reverse the order of errors.
+	// $errors = array_reverse( $errors );
+
+	// foreach ( $errors as $error ) {
+	// $message = $this->extract_phpmailer_message( $error['error'] );
+	// if ( $message ) {
+	// $phpmailer_errors[] = array(
+	// 'time'    => $error['time'],
+	// 'message' => $message,
+	// );
+	// }
+	// }
+	// }
+
+	// echo '<h2>Email Logs</h2>';
+
+	// if ( ! empty( $phpmailer_errors ) ) {
+	// echo '<ul>';
+	// foreach ( $phpmailer_errors as $error ) {
+	// echo '<li><strong>Time:</strong> ' . esc_html( $error['time'] ) . ' - <strong>PHPMailer error:</strong> ' . esc_html( $error['message'] ) . '</li>';
+	// }
+	// echo '</ul>';
+	// } else {
+	// echo '<p>' . esc_html__( 'No PHPMailer errors found.', 'adas_quote_request' ) . '</p>';     }
+	// }
+
 	private function display_email_errors() {
 		$errors           = get_option( 'adas_quote_email_errors', array() );
 		$phpmailer_errors = array();
+		$general_errors   = array();
+		$max_errors       = 5; // Limit to 5 most recent errors for each category
 
 		if ( ! empty( $errors ) ) {
-			// Reverse the order of errors.
 			$errors = array_reverse( $errors );
 
 			foreach ( $errors as $error ) {
-				$message = $this->extract_phpmailer_message( $error['error'] );
-				if ( $message ) {
-					$phpmailer_errors[] = array(
-						'time'    => $error['time'],
-						'message' => $message,
-					);
+				$time          = sanitize_text_field( $error['time'] );
+				$error_message = esc_html( $error['error'] );
+
+				$phpmailer_message = $this->extract_phpmailer_message( $error['error'] );
+
+				if ( $phpmailer_message ) {
+					if ( count( $phpmailer_errors ) < $max_errors ) {
+						$phpmailer_errors[] = array(
+							'time'    => $time,
+							'message' => esc_html( $phpmailer_message ),
+						);
+					}
+				} elseif ( count( $general_errors ) < $max_errors ) {
+						$general_errors[] = array(
+							'time'    => $time,
+							'message' => $error_message,
+						);
+				}
+
+				if ( count( $phpmailer_errors ) >= $max_errors && count( $general_errors ) >= $max_errors ) {
+					break;
 				}
 			}
 		}
 
-		echo '<h2>Email Logs</h2>';
+		return array(
+			'phpmailer_errors' => $phpmailer_errors,
+			'general_errors'   => $general_errors,
+		);
+	}
 
-		if ( ! empty( $phpmailer_errors ) ) {
+	public function render_email_errors() {
+		$errors = $this->display_email_errors();
+
+		echo '<h2>' . esc_html__( 'Email Logs', 'adas_quote_request' ) . '</h2>';
+
+		// Display general errors
+		if ( ! empty( $errors['general_errors'] ) ) {
 			echo '<ul>';
-			foreach ( $phpmailer_errors as $error ) {
-				echo '<li><strong>Time:</strong> ' . esc_html( $error['time'] ) . ' - <strong>PHPMailer error:</strong> ' . esc_html( $error['message'] ) . '</li>';
+			foreach ( $errors['general_errors'] as $error ) {
+				echo '<li><strong>' . esc_html__( 'Time:', 'adas_quote_request' ) . '</strong> ' . esc_html( $error['time'] ) . ' - <strong>' . esc_html__( 'Log:', 'adas_quote_request' ) . '</strong> ' . esc_html( $error['message'] ) . '</li>';
 			}
 			echo '</ul>';
-		} else {
-			echo '<p>No PHPMailer errors found.</p>';
 		}
+
+		// Display PHPMailer errors
+		// echo '<h3>' . esc_html__( 'PHPMailer Errors', 'adas_quote_request' ) . '</h3>';
+		if ( ! empty( $errors['phpmailer_errors'] ) ) {
+			echo '<ul>';
+			foreach ( $errors['phpmailer_errors'] as $error ) {
+				echo '<li><strong>' . esc_html__( 'Time:', 'adas_quote_request' ) . '</strong> ' . esc_html( $error['time'] ) . ' - <strong>' . esc_html__( 'PHPMailer Log:', 'adas_quote_request' ) . '</strong> ' . esc_html( $error['message'] ) . '</li>';
+			}
+			echo '</ul>';
+		} //else {
+		// echo '<p>' . esc_html__( 'No PHPMailer errors found.', 'adas_quote_request' ) . '</p>';
+		// }
 	}
 
 	/**
 	 * Extract PHPMailer error message.
 	 */
 	private function extract_phpmailer_message( $error_string ) {
-		if ( strpos( $error_string, 'PHPMailer error:' ) !== false ) {
+		if ( strpos( $error_string, 'PHPMailer log:' ) !== false ) {
 			$json_start = strpos( $error_string, '{' );
 			if ( $json_start !== false ) {
 				$json_string = substr( $error_string, $json_start );
@@ -187,40 +252,9 @@ class ADAS_Quote_Plugin {
 		return null;
 	}
 
-	/**
-	 * Format a single error entry.
-	 */
-	private function format_error_entry( $error ) {
-		$output  = "Time: {$error['time']}\n";
-		$output .= 'Log: ';
 
-		// Check if the error message is JSON
-		$decoded_error = json_decode( $error['error'], true );
-		if ( json_last_error() === JSON_ERROR_NONE ) {
-			$output .= "\n" . $this->format_json_error( $decoded_error );
-		} else {
-			$output .= $error['error'] . "\n";
-		}
 
-		$output .= "\n";
-		return esc_html( $output );
-	}
 
-	/**
-	 * Format JSON error message.
-	 */
-	private function format_json_error( $error_data, $indent = 0 ) {
-		$output = '';
-		foreach ( $error_data as $key => $value ) {
-			$output .= str_repeat( '  ', $indent ) . "$key: ";
-			if ( is_array( $value ) ) {
-				$output .= "\n" . $this->format_json_error( $value, $indent + 1 );
-			} else {
-				$output .= "$value\n";
-			}
-		}
-		return $output;
-	}
 
 
 	/**
@@ -228,8 +262,8 @@ class ADAS_Quote_Plugin {
 	 */
 	public function add_plugin_page() {
 		add_options_page(
-			'ADAS Quote Settings',
-			'ADAS Quote',
+			'Adas Quote Settings',
+			'Adas Quote',
 			'manage_options',
 			'adas-quote-settings',
 			array( $this, 'create_admin_page' )
@@ -243,170 +277,170 @@ class ADAS_Quote_Plugin {
 	 */
 	public function page_init() {
 		register_setting(
-            'adas_quote_settings_group',
-            'adas_quote_hide_add_to_cart'
-        );
-        register_setting(
-            'adas_quote_settings_group',
-            'adas_quote_hide_price'
-        );
-        register_setting(
-            'adas_quote_settings_group',
-            'adas_quote_custom_email_message'
-        );
-        register_setting(
-            'adas_quote_settings_group',
-            'adas_quote_admin_email'
-        );
-        register_setting(
-            'adas_quote_settings_group',
-            'adas_quote_selected_products'
-        );
-        register_setting(
-            'adas_quote_settings_group',
-            'adas_quote_selected_categories'
-        );
-        register_setting(
-            'adas_quote_settings_group',
-            'adas_quote_gmail_smtp_username'
-        );
-        register_setting(
-            'adas_quote_settings_group',
-            'adas_quote_gmail_smtp_password'
-        );
-        register_setting(
-            'adas_quote_settings_group',
-            'adas_quote_email_subject'
-        );
-        register_setting(
-            'adas_quote_settings_group',
-            'adas_quote_display_email_errors'
-        );
-        register_setting(
-            'adas_quote_settings_group',
-            'adas_quote_enable_recaptcha'
-        );
-        register_setting(
-            'adas_quote_settings_group',
-            'adas_quote_recaptcha_secret_key'
-        );
-        register_setting(
-            'adas_quote_settings_group',
-            'adas_quote_recaptcha_site_key'
-        );
+			'adas_quote_settings_group',
+			'adas_quote_hide_add_to_cart'
+		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_hide_price'
+		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_custom_email_message'
+		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_admin_email'
+		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_selected_products'
+		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_selected_categories'
+		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_gmail_smtp_username'
+		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_gmail_smtp_password'
+		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_email_subject'
+		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_display_email_errors'
+		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_enable_recaptcha'
+		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_recaptcha_secret_key'
+		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_recaptcha_site_key'
+		);
 
-        add_settings_section(
-            'adas_quote_settings_section',
-            __( 'ADAS Quote Settings', 'AQ' ),
-            array( $this, 'settings_section_callback' ),
-            'adas-quote-settings'
-        );
-        add_settings_section(
-            'adas_smtp_settings_section',
-            __( 'SMTP Settings', 'AQ' ),
-            array( $this, 'smtp_settings_section_callback' ),
-            'adas-quote-settings'
-        );
-        add_settings_section(
-            'adas_recaptcha_settings_section',
-            __( 'reCAPTCHA Settings', 'AQ' ),
-            array( $this, 'recaptcha_settings_section_callback' ),
-            'adas-quote-settings'
-        );
+		add_settings_section(
+			'adas_quote_settings_section',
+			__( 'Adas Quote Settings', 'adas_quote_request' ),
+			array( $this, 'settings_section_callback' ),
+			'adas-quote-settings'
+		);
+		add_settings_section(
+			'adas_smtp_settings_section',
+			__( 'SMTP Settings', 'adas_quote_request' ),
+			array( $this, 'smtp_settings_section_callback' ),
+			'adas-quote-settings'
+		);
+		add_settings_section(
+			'adas_recaptcha_settings_section',
+			__( 'reCAPTCHA Settings', 'adas_quote_request' ),
+			array( $this, 'recaptcha_settings_section_callback' ),
+			'adas-quote-settings'
+		);
 
-        add_settings_field(
-            'adas_quote_gmail_smtp_username',
-            __( 'Gmail SMTP Username', 'AQ' ),
-            array( $this, 'gmail_smtp_username_callback' ),
-            'adas-quote-settings',
-            'adas_smtp_settings_section'
-        );
-        add_settings_field(
-            'adas_quote_gmail_smtp_password',
-            __( 'Gmail SMTP Password', 'AQ' ),
-            array( $this, 'gmail_smtp_password_callback' ),
-            'adas-quote-settings',
-            'adas_smtp_settings_section'
-        );
-        add_settings_field(
-            'adas_quote_display_email_errors',
-            __( 'Display Email Errors', 'AQ' ),
-            array( $this, 'display_email_errors_callback' ),
-            'adas-quote-settings',
-            'adas_smtp_settings_section'
-        );
-        add_settings_field(
-            'adas_quote_selected_categories',
-            __( 'Select Categories for Quote Button', 'AQ' ),
-            array( $this, 'selected_categories_callback' ),
-            'adas-quote-settings',
-            'adas_quote_settings_section'
-        );
-        add_settings_field(
-            'adas_quote_selected_products',
-            __( 'Select Products for Quote Button', 'AQ' ),
-            array( $this, 'selected_products_callback' ),
-            'adas-quote-settings',
-            'adas_quote_settings_section'
-        );
-        add_settings_field(
-            'adas_quote_hide_add_to_cart',
-            __( 'Hide Add To Cart Button', 'AQ' ),
-            array( $this, 'hide_add_to_cart_callback' ),
-            'adas-quote-settings',
-            'adas_quote_settings_section'
-        );
-        add_settings_field(
-            'adas_quote_hide_price',
-            __( 'Hide Price', 'AQ' ),
-            array( $this, 'adas_quote_show_price_callback' ),
-            'adas-quote-settings',
-            'adas_quote_settings_section'
-        );
-        add_settings_field(
-            'adas_quote_custom_email_message',
-            __( 'Custom Email Message', 'AQ' ),
-            array( $this, 'adas_quote_custom_email_message_callback' ),
-            'adas-quote-settings',
-            'adas_quote_settings_section'
-        );
-        add_settings_field(
-            'adas_quote_email_subject',
-            __( 'Email Subject', 'AQ' ),
-            array( $this, 'email_subject_callback' ),
-            'adas-quote-settings',
-            'adas_quote_settings_section'
-        );
-        add_settings_field(
-            'adas_quote_admin_email',
-            __( 'Admin Email', 'AQ' ),
-            array( $this, 'admin_email_callback' ),
-            'adas-quote-settings',
-            'adas_quote_settings_section'
-        );
-        add_settings_field(
-            'adas_quote_enable_recaptcha',
-            __( 'Enable reCAPTCHA', 'AQ' ),
-            array( $this, 'enable_recaptcha_callback' ),
-            'adas-quote-settings',
-            'adas_recaptcha_settings_section'
-        );
-        add_settings_field(
-            'adas_quote_recaptcha_secret_key',
-            __( 'reCAPTCHA Secret Key', 'AQ' ),
-            array( $this, 'recaptcha_secret_key_callback' ),
-            'adas-quote-settings',
-            'adas_recaptcha_settings_section',
-            array( 'class' => 'recaptcha-field' )
-        );
-        add_settings_field(
-            'adas_quote_recaptcha_site_key',
-            __( 'reCAPTCHA Site Key', 'AQ' ),
-            array( $this, 'recaptcha_site_key_callback' ),
-            'adas-quote-settings',
-            'adas_recaptcha_settings_section',
-            array( 'class' => 'recaptcha-field' )
-        );
+		add_settings_field(
+			'adas_quote_gmail_smtp_username',
+			__( 'Gmail SMTP Username', 'adas_quote_request' ),
+			array( $this, 'gmail_smtp_username_callback' ),
+			'adas-quote-settings',
+			'adas_smtp_settings_section'
+		);
+		add_settings_field(
+			'adas_quote_gmail_smtp_password',
+			__( 'Gmail SMTP Password', 'adas_quote_request' ),
+			array( $this, 'gmail_smtp_password_callback' ),
+			'adas-quote-settings',
+			'adas_smtp_settings_section'
+		);
+		add_settings_field(
+			'adas_quote_display_email_errors',
+			__( 'Display Email Errors', 'adas_quote_request' ),
+			array( $this, 'display_email_errors_callback' ),
+			'adas-quote-settings',
+			'adas_smtp_settings_section'
+		);
+		add_settings_field(
+			'adas_quote_selected_categories',
+			__( 'Select Categories for Quote Button', 'adas_quote_request' ),
+			array( $this, 'selected_categories_callback' ),
+			'adas-quote-settings',
+			'adas_quote_settings_section'
+		);
+		add_settings_field(
+			'adas_quote_selected_products',
+			__( 'Select Products for Quote Button', 'adas_quote_request' ),
+			array( $this, 'selected_products_callback' ),
+			'adas-quote-settings',
+			'adas_quote_settings_section'
+		);
+		add_settings_field(
+			'adas_quote_hide_add_to_cart',
+			__( 'Hide Add To Cart Button', 'adas_quote_request' ),
+			array( $this, 'hide_add_to_cart_callback' ),
+			'adas-quote-settings',
+			'adas_quote_settings_section'
+		);
+		add_settings_field(
+			'adas_quote_hide_price',
+			__( 'Hide Price', 'adas_quote_request' ),
+			array( $this, 'adas_quote_show_price_callback' ),
+			'adas-quote-settings',
+			'adas_quote_settings_section'
+		);
+		add_settings_field(
+			'adas_quote_custom_email_message',
+			__( 'Custom Email Message', 'adas_quote_request' ),
+			array( $this, 'adas_quote_custom_email_message_callback' ),
+			'adas-quote-settings',
+			'adas_quote_settings_section'
+		);
+		add_settings_field(
+			'adas_quote_email_subject',
+			__( 'Email Subject', 'adas_quote_request' ),
+			array( $this, 'email_subject_callback' ),
+			'adas-quote-settings',
+			'adas_quote_settings_section'
+		);
+		add_settings_field(
+			'adas_quote_admin_email',
+			__( 'Admin Email', 'adas_quote_request' ),
+			array( $this, 'admin_email_callback' ),
+			'adas-quote-settings',
+			'adas_quote_settings_section'
+		);
+		add_settings_field(
+			'adas_quote_enable_recaptcha',
+			__( 'Enable reCAPTCHA', 'adas_quote_request' ),
+			array( $this, 'enable_recaptcha_callback' ),
+			'adas-quote-settings',
+			'adas_recaptcha_settings_section'
+		);
+		add_settings_field(
+			'adas_quote_recaptcha_secret_key',
+			__( 'reCAPTCHA Secret Key', 'adas_quote_request' ),
+			array( $this, 'recaptcha_secret_key_callback' ),
+			'adas-quote-settings',
+			'adas_recaptcha_settings_section',
+			array( 'class' => 'recaptcha-field' )
+		);
+		add_settings_field(
+			'adas_quote_recaptcha_site_key',
+			__( 'reCAPTCHA Site Key', 'adas_quote_request' ),
+			array( $this, 'recaptcha_site_key_callback' ),
+			'adas-quote-settings',
+			'adas_recaptcha_settings_section',
+			array( 'class' => 'recaptcha-field' )
+		);
 
 			// Add JavaScript to hide/show reCAPTCHA fields based on the checkbox state.
 			add_action(
@@ -419,20 +453,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-    const recaptchaCheckbox = document.querySelector('input[name="adas_quote_enable_recaptcha"]');
-    const recaptchaFields = document.querySelectorAll('.recaptcha-field');
+	const recaptchaCheckbox = document.querySelector('input[name="adas_quote_enable_recaptcha"]');
+	const recaptchaFields = document.querySelectorAll('.recaptcha-field');
 
-    function toggleRecaptchaFields() {
-        recaptchaFields.forEach(field => {
-            field.closest('tr').style.display = recaptchaCheckbox.checked ? '' : 'none';
-        });
-    }
+	function toggleRecaptchaFields() {
+		recaptchaFields.forEach(field => {
+			field.closest('tr').style.display = recaptchaCheckbox.checked ? '' : 'none';
+		});
+	}
 
-    recaptchaCheckbox.addEventListener('change', toggleRecaptchaFields);
-    toggleRecaptchaFields(); // Initial call to set the correct state on page load
+	recaptchaCheckbox.addEventListener('change', toggleRecaptchaFields);
+	toggleRecaptchaFields(); // Initial call to set the correct state on page load
 });
 </script>
-<?php
+					<?php
 				}
 			);
 	}
@@ -450,7 +484,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		 * Callback function for the reCAPTCHA settings section.
 		 */
 	public function recaptcha_settings_section_callback() {
-		echo '<p>' . esc_html__( 'Configure the reCAPTCHA settings for the quote request form.', 'AQ' ) . '</p>';
+		echo '<p>' . esc_html__( 'Configure the reCAPTCHA settings for the quote request form.', 'adas_quote_request' ) . '</p>';
 	}
 
 	/**
@@ -523,8 +557,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		printf(
 			'<p>%s</p>',
 			esc_html__(
-				'Configure settings for the ADAS Quote plugin.',
-				'ADAS Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.
+				'Configure settings for the Adas Quote plugin.',
+				'Adas Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.
 
 '
 			)
@@ -554,7 +588,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	 * Callback function for displaying the SMTP settings section description.
 	 */
 	public function smtp_settings_section_callback() {
-		echo '<p>Configure SMTP settings for sending emails.</p>';
+		echo '<p> </p>';
 	}
 
 	/**
@@ -636,7 +670,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		);
 
 		if ( ! $products ) {
-			echo esc_html__( 'No products found.', 'AQ' );
+			echo esc_html__( 'No products found.', 'adas_quote_request' );
 			error_log( 'No products found.' );
 			return;
 		}
@@ -669,7 +703,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			esc_html(
 				sprintf(
 					// Translators: 1: Number of products.
-					_n( '1 product', '%s products', count( $total_products ), 'AQ' ),
+					_n( '1 product', '%s products', count( $total_products ), 'adas_quote_request' ),
 					count( $total_products )
 				)
 			)
@@ -720,12 +754,12 @@ document.addEventListener('DOMContentLoaded', function() {
 	private function display_settings_form() {
 		?>
 <form method="post" action="options.php">
-    <?php
+		<?php
 			settings_fields( 'adas_quote_settings_group' );
 			do_settings_sections( 'adas-quote-settings' );
 			submit_button();
 		?>
 </form>
-<?php
+		<?php
 	}
 }
