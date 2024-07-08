@@ -21,7 +21,7 @@ function adas_db_init() {
 	if ( is_admin() ) {
 		require_once 'adas-quote-wplist.php';
 		require_once 'includes/class-adas-quote-form-details.php';
-		require_once 'includes/adas-quote-details-ufd.php';
+		require_once 'includes/class-adas-quote-form-details-ufd.php';
 	}
 }
 
@@ -34,28 +34,22 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-wc-settings-adas-quot
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-custom-enqueue.php';
 
-// Include the  class-plugintoolbox.php file.
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-plugintoolbox.php';
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-quote-button-form.php';
 
-require_once plugin_dir_path( __FILE__ ) . 'includes/class_kh_woo_db.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-kh-woo-db.php';
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-aq-error-logger.php';
 
-// Include the i18n class file.
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-adas-quote-i18n.php';
 
 
-
-
-
-// Initialize the plugin.
 add_action( 'plugins_loaded', array( 'Custom_Quote_Request', 'init' ) );
 
 /**
  *
- *  This function is used to initialize the plugin.
+ *  Initialize the setting class.
  *
  * @return void
  */

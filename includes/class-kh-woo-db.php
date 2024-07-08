@@ -42,10 +42,6 @@ class KH_Woo_DB {
 			require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 			dbDelta( $sql );
 
-			// Check for errors during table creation
-			if ( $wpdb->last_error !== '' ) {
-				error_log( 'Error creating table: ' . $wpdb->last_error );
-			}
 		}
 	}
 }

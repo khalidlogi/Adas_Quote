@@ -161,7 +161,6 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 			case 'date_submitted':
 				return $item[ $column_name ];
 			default:
-				// return print_r( $item, true ); // Show the whole array for troubleshooting purposes.
 		}
 	}
 
@@ -311,11 +310,15 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 		$total_pages  = ceil( $total_items / $this->_pagination_args['per_page'] );
 
 		$output = '<div class="tablenav-pages">';
-			// translators: %s: Number of items.
-			$output .= sprintf(
-				'<span class="displaying-num">' . _n( '%s item', '%s items', $total_items ) . '</span>',
+
+		$output .= sprintf(
+			'<span class="displaying-num">%s</span>',
+			sprintf(
+				/* translators: %s: Number of items */
+				_n( '%s item', '%s items', $total_items, 'your-text-domain' ),
 				number_format_i18n( $total_items )
-			);
+			)
+		);
 
 		if ( $total_pages > 1 ) {
 			$page_links = paginate_links(
@@ -396,18 +399,14 @@ class ADASQT_Wp_Sub_Page extends WP_List_Table {
 
 		$product_id = absint( $this->product_id );
 
-		// Prepare the query.
+	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$query = $wpdb->prepare(
-			"SELECT * FROM {$wpdb->prefix}kh_woo 
-            WHERE product_id = %d 
-            ORDER BY {$orderby} {$order} 
-            LIMIT %d OFFSET %d",
+			"SELECT * FROM {$wpdb->prefix}kh_woo WHERE product_id = %d ORDER BY {$orderby} {$order} 
+     LIMIT %d OFFSET %d",
 			$product_id,
 			$items_per_page,
 			$offset
 		);
-
-		// Execute the query.
         // phpcs:ignore.
 		$results = $wpdb->get_results( $query, ARRAY_A );
 

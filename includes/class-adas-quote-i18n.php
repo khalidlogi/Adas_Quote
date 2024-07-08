@@ -34,24 +34,3 @@ class Adas_Quote_I18n {
 }
 
 add_action( 'plugins_loaded', array( 'Adas_Quote_I18n', 'load_textdomain' ) );
-
-
-/*
-add_action(
-	'plugins_loaded',
-	function () {
-		$locale = determine_locale();
-		$mofile = WP_PLUGIN_DIR . '/adas-quote-for-wc/languages/adas_quote_request-' . $locale . '.mo';
-
-		error_log( 'Attempting to load MO file: ' . $mofile );
-
-		$loaded = load_textdomain( 'adas_quote_request', $mofile );
-
-		if ( $loaded ) {
-			error_log( 'Successfully loaded text domain from file' );
-		} else {
-			error_log( 'Failed to load text domain from file' );
-		}
-	},
-	0
-);*/

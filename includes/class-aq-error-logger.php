@@ -60,8 +60,7 @@ class AQ_Error_Logger {
 	 * @return string The formatted log data.
 	 */
 	public static function format_log_data( $log_data ) {
-		error_log( '$log_data : ' . print_r( $log_data, true ) );
-		error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
+
 		$formatted_output = '';
 		foreach ( $log_data as $entry ) {
 			$formatted_output .= "Time: {$entry['time']}\n";

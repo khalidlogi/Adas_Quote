@@ -45,7 +45,6 @@ class PluginToolbox {
 			$mail->send();
 			return true;
 		} catch ( Exception $e ) {
-			// error_log( 'Admin Notification Error: ' . $mail->ErrorInfo );
 			return false;
 		}
 	}
@@ -251,8 +250,6 @@ class PluginToolbox {
 		} else {
 			$log_message = 'Email Sending Error: ' . $error_message;
 		}
-
-		error_log( $log_message );
 
 		// Store errors in a custom option for admin review.
 		$current_errors   = get_option( 'adas_quote_email_errors', array() );

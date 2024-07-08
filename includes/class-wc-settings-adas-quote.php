@@ -79,16 +79,16 @@ class ADAS_Quote_Plugin {
 	public function no_products_notice() {
 		?>
 <div class="notice notice-warning">
-	<p>
-		<?php
+    <p>
+        <?php
 		esc_html_e(
 			'No products found. Please create at least one product to use Adas Quote Plugin effectively.',
 			'adas_quote_request'
 		);
 		?>
-	</p>
+    </p>
 </div>
-		<?php
+<?php
 	}
 
 	/**
@@ -97,10 +97,10 @@ class ADAS_Quote_Plugin {
 	public function woocommerce_missing_notice() {
 		?>
 <div class="notice notice-error">
-	<p><?php esc_html_e( 'Adas Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.', 'adas_quote_request' ); ?>
-	</p>
+    <p><?php esc_html_e( 'Adas Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.', 'adas_quote_request' ); ?>
+    </p>
 </div>
-		<?php
+<?php
 	}
 
 	/**
@@ -109,7 +109,7 @@ class ADAS_Quote_Plugin {
 	public function create_admin_page() {
 		?>
 <div class="wrap">
-		<?php
+    <?php
 		if ( ! $this->check_woocommerce() ) {
 			$this->woocommerce_missing_notice();
 		} elseif ( ! $this->check_products_exist() ) {
@@ -127,51 +127,18 @@ class ADAS_Quote_Plugin {
 
 		?>
 </div>
-		<?php
+<?php
 	}
 
+
 	/**
-	 * Display email errors from the logs.
+	 * Display errors.
 	 */
-	/**
-	 * Display email errors from the logs.
-	 */
-	// private function display_email_errors() {
-	// $errors           = get_option( 'adas_quote_email_errors', array() );
-	// $phpmailer_errors = array();
-
-	// if ( ! empty( $errors ) ) {
-	// Reverse the order of errors.
-	// $errors = array_reverse( $errors );
-
-	// foreach ( $errors as $error ) {
-	// $message = $this->extract_phpmailer_message( $error['error'] );
-	// if ( $message ) {
-	// $phpmailer_errors[] = array(
-	// 'time'    => $error['time'],
-	// 'message' => $message,
-	// );
-	// }
-	// }
-	// }
-
-	// echo '<h2>Email Logs</h2>';
-
-	// if ( ! empty( $phpmailer_errors ) ) {
-	// echo '<ul>';
-	// foreach ( $phpmailer_errors as $error ) {
-	// echo '<li><strong>Time:</strong> ' . esc_html( $error['time'] ) . ' - <strong>PHPMailer error:</strong> ' . esc_html( $error['message'] ) . '</li>';
-	// }
-	// echo '</ul>';
-	// } else {
-	// echo '<p>' . esc_html__( 'No PHPMailer errors found.', 'adas_quote_request' ) . '</p>';     }
-	// }
-
 	private function display_email_errors() {
 		$errors           = get_option( 'adas_quote_email_errors', array() );
 		$phpmailer_errors = array();
 		$general_errors   = array();
-		$max_errors       = 5; // Limit to 5 most recent errors for each category
+		$max_errors       = 5; // Limit to 5 most recent errors for each category.
 
 		if ( ! empty( $errors ) ) {
 			$errors = array_reverse( $errors );
@@ -208,12 +175,15 @@ class ADAS_Quote_Plugin {
 		);
 	}
 
+	/**
+	 * Render email errors in the admin settings page.
+	 */
 	public function render_email_errors() {
 		$errors = $this->display_email_errors();
 
 		echo '<h2>' . esc_html__( 'Email Logs', 'adas_quote_request' ) . '</h2>';
 
-		// Display general errors
+		// Display general errors.
 		if ( ! empty( $errors['general_errors'] ) ) {
 			echo '<ul>';
 			foreach ( $errors['general_errors'] as $error ) {
@@ -223,20 +193,20 @@ class ADAS_Quote_Plugin {
 		}
 
 		// Display PHPMailer errors
-		// echo '<h3>' . esc_html__( 'PHPMailer Errors', 'adas_quote_request' ) . '</h3>';
 		if ( ! empty( $errors['phpmailer_errors'] ) ) {
 			echo '<ul>';
 			foreach ( $errors['phpmailer_errors'] as $error ) {
 				echo '<li><strong>' . esc_html__( 'Time:', 'adas_quote_request' ) . '</strong> ' . esc_html( $error['time'] ) . ' - <strong>' . esc_html__( 'PHPMailer Log:', 'adas_quote_request' ) . '</strong> ' . esc_html( $error['message'] ) . '</li>';
 			}
 			echo '</ul>';
-		} //else {
-		// echo '<p>' . esc_html__( 'No PHPMailer errors found.', 'adas_quote_request' ) . '</p>';
-		// }
+		}
 	}
 
 	/**
 	 * Extract PHPMailer error message.
+	 *
+	 * @param string $error_string The error string containing the PHPMailer log.
+	 * @return string|null The extracted PHPMailer error message or null if not found.
 	 */
 	private function extract_phpmailer_message( $error_string ) {
 		if ( strpos( $error_string, 'PHPMailer log:' ) !== false ) {
@@ -453,20 +423,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-	const recaptchaCheckbox = document.querySelector('input[name="adas_quote_enable_recaptcha"]');
-	const recaptchaFields = document.querySelectorAll('.recaptcha-field');
+    const recaptchaCheckbox = document.querySelector('input[name="adas_quote_enable_recaptcha"]');
+    const recaptchaFields = document.querySelectorAll('.recaptcha-field');
 
-	function toggleRecaptchaFields() {
-		recaptchaFields.forEach(field => {
-			field.closest('tr').style.display = recaptchaCheckbox.checked ? '' : 'none';
-		});
-	}
+    function toggleRecaptchaFields() {
+        recaptchaFields.forEach(field => {
+            field.closest('tr').style.display = recaptchaCheckbox.checked ? '' : 'none';
+        });
+    }
 
-	recaptchaCheckbox.addEventListener('change', toggleRecaptchaFields);
-	toggleRecaptchaFields(); // Initial call to set the correct state on page load
+    recaptchaCheckbox.addEventListener('change', toggleRecaptchaFields);
+    toggleRecaptchaFields(); // Initial call to set the correct state on page load
 });
 </script>
-					<?php
+<?php
 				}
 			);
 	}
@@ -655,8 +625,6 @@ document.addEventListener('DOMContentLoaded', function() {
 		// Only apply array_map if $selected_products is not empty.
 		$selected_products = ! empty( $selected_products ) ? array_flip( array_map( 'intval', $selected_products ) ) : array();
 
-		error_log( 'Selected products: ' . print_r( $selected_products, true ) );
-
 		$paged    = isset( $_REQUEST['paged'] ) ? absint( $_REQUEST['paged'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification
 		$per_page = 50;
 		$products = wc_get_products(
@@ -671,7 +639,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		if ( ! $products ) {
 			echo esc_html__( 'No products found.', 'adas_quote_request' );
-			error_log( 'No products found.' );
 			return;
 		}
 
@@ -679,7 +646,6 @@ document.addEventListener('DOMContentLoaded', function() {
 		foreach ( $products as $product ) {
 			$product_id  = (int) $product->get_id();
 			$is_selected = isset( $selected_products[ $product_id ] );
-			error_log( "Product ID: $product_id, Is Selected: " . ( $is_selected ? 'Yes' : 'No' ) );
 			printf(
 				'<option value="%d" %s>%s</option>',
 				esc_attr( $product_id ),
@@ -702,9 +668,9 @@ document.addEventListener('DOMContentLoaded', function() {
 			'<span class="displaying-num">%s</span>',
 			esc_html(
 				sprintf(
-					// Translators: 1: Number of products.
-					_n( '1 product', '%s products', count( $total_products ), 'adas_quote_request' ),
-					count( $total_products )
+				// Translators: %s: Number of products.
+					_n( '%s product', '%s products', count( $total_products ), 'adas_quote_request' ),
+					number_format_i18n( count( $total_products ) )
 				)
 			)
 		);
@@ -719,7 +685,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		);
 
 		$pagination_links = paginate_links( $pagination_args );
-		if ( $pagination_links !== null ) {
+		if ( null !== $pagination_links ) {
 			echo '<span class="pagination-links">' . wp_kses_post( $pagination_links ) . '</span>';
 		}   }
 
@@ -754,12 +720,12 @@ document.addEventListener('DOMContentLoaded', function() {
 	private function display_settings_form() {
 		?>
 <form method="post" action="options.php">
-		<?php
+    <?php
 			settings_fields( 'adas_quote_settings_group' );
 			do_settings_sections( 'adas-quote-settings' );
 			submit_button();
 		?>
 </form>
-		<?php
+<?php
 	}
 }

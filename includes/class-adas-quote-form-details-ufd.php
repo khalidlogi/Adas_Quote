@@ -1,4 +1,11 @@
 <?php
+/**
+ * Adas Quote Form Details Ufd
+ *
+ * This file contains the Adas_Quote_Form_Details_Ufd class which handles the display of details for a submitted form.
+ *
+ * @package   AdasQuoteForWC
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -57,12 +64,12 @@ class Adas_Quote_Form_Details_Ufd {
 		}
 	}
 
-	/**
-	 * Retrieves the submitted form values for the given form ID.
-	 *
-	 * @param string $formid The ID of the form to retrieve the values for.
-	 * @return array|null An array containing the form values and other relevant information, or null if no results are found.
-	 */
+		/**
+		 * Retrieves the submitted form values for the given form ID.
+		 *
+		 * @param string $quote_id The ID of the quote to retrieve.
+		 * @return array|null An array containing the form values and other relevant information, or null if no results are found.
+		 */
 	public function retrieve_form_values( $quote_id = '' ) {
 		global $wpdb;
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -118,9 +125,7 @@ class Adas_Quote_Form_Details_Ufd {
 	public function form_details_page() {
 		global $wpdb;
 
-		$result = $this->retrieve_form_values( $this->quote_id );
-		error_log( '$result : ' . print_r( $result, true ) );
-		error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
+		$result           = $this->retrieve_form_values( $this->quote_id );
 		$results          = $result['data'];
 		$form_data        = $result['data'];
 		$product_id       = $result['product_id'];
@@ -196,10 +201,6 @@ class Adas_Quote_Form_Details_Ufd {
 			if ( is_array( $data ) ) {
 				$data = $data['value'] ?? $data;
 			}
-
-			// if ( filter_var( $data, FILTER_VALIDATE_EMAIL ) ) {
-			// $this->adasclientemail = $data;
-			// }
 
 			// If the value is an array again, implode it into a comma-separated string with newlines between each value, and then convert it to a formatted string.
 			if ( is_array( $data ) ) {

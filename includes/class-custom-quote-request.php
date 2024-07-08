@@ -64,7 +64,6 @@ class Custom_Quote_Request {
 	 * @return void
 	 */
 	public static function enqueue_scripts() {
-		error_log( 'enqueue_scripts' );
 		// Ensure jQuery is enqueued.
 		wp_enqueue_script( 'jquery' );
 
@@ -119,15 +118,14 @@ class Custom_Quote_Request {
 		$variations_attr  = isset( $_POST['variations_attr'] ) ? json_decode( stripslashes( sanitize_text_field( wp_unslash( $_POST['variations_attr'] ) ) ), true ) : array();
 
 		// Verify reCAPTCHA.
-		if ( get_option( 'adas_quote_recaptcha_site_key' ) != ''
-		&& get_option( 'adas_quote_recaptcha_secret_key' ) != ''
-		&& get_option( 'adas_quote_enable_recaptcha' ) != '' ) {
+		if ( get_option( 'adas_quote_recaptcha_site_key' ) !== ''
+		&& get_option( 'adas_quote_recaptcha_secret_key' ) !== ''
+		&& get_option( 'adas_quote_enable_recaptcha' ) !== '' ) {
 
-			$recaptcha_secret   = get_option( 'adas_quote_recaptcha_secret_key' );
-			$recaptcha_response = $_POST['g-recaptcha-response'];
-			error_log( '$recaptcha_response: ' . print_r( $recaptcha_response, true ) );
-			error_log( 'in ' . __FILE__ . ' on line ' . __LINE__ );
-
+			$recaptcha_secret = get_option( 'adas_quote_recaptcha_secret_key' );
+			if ( isset( $_POST['g-recaptcha-response'] ) ) {
+				$recaptcha_response = sanitize_text_field( wp_unslash( $_POST['g-recaptcha-response'] ) );
+			}
 			$verify_response = wp_remote_get(
 				"https://www.google.com/recaptcha/api/siteverify?secret=$recaptcha_secret&response=$recaptcha_response"
 			);
@@ -139,7 +137,6 @@ class Custom_Quote_Request {
 		}
 
 		// Validate required fields.
-		// if ( empty( $product_id ) || empty( $variation_id ) || empty( $useremail ) ) {
 		if ( empty( $product_id ) ) {
 
 			wp_send_json_error( 'Missing required data', 400 );
