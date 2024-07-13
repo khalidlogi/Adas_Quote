@@ -192,7 +192,7 @@ class ADAS_Quote_Plugin {
 			echo '</ul>';
 		}
 
-		// Display PHPMailer errors
+		// Display PHPMailer errors.
 		if ( ! empty( $errors['phpmailer_errors'] ) ) {
 			echo '<ul>';
 			foreach ( $errors['phpmailer_errors'] as $error ) {
@@ -211,7 +211,7 @@ class ADAS_Quote_Plugin {
 	private function extract_phpmailer_message( $error_string ) {
 		if ( strpos( $error_string, 'PHPMailer log:' ) !== false ) {
 			$json_start = strpos( $error_string, '{' );
-			if ( $json_start !== false ) {
+			if ( false !== $json_start ) {
 				$json_string = substr( $error_string, $json_start );
 				$error_data  = json_decode( $json_string, true );
 				if ( json_last_error() === JSON_ERROR_NONE && isset( $error_data['error']['message'] ) ) {
@@ -297,6 +297,22 @@ class ADAS_Quote_Plugin {
 		register_setting(
 			'adas_quote_settings_group',
 			'adas_quote_recaptcha_site_key'
+		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_custom_button_label'
+		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_user_logo'
+		);
+
+		add_settings_field(
+			'adas_quote_custom_button_label',
+			'<label for="adas_quote_custom_button_label" class="adas-custom-button-label">' . __( 'Custom Button Label', 'adas_quote_request' ) . '</label>',
+			array( $this, 'custom_button_label_callback' ),
+			'adas-quote-settings',
+			'adas_quote_settings_section'
 		);
 
 		add_settings_section(
@@ -389,6 +405,13 @@ class ADAS_Quote_Plugin {
 			'adas_quote_settings_section'
 		);
 		add_settings_field(
+			'adas_user_logo',
+			__( 'Company Logo', 'adas_quote_request' ),
+			array( $this, 'adas_quote_logo_upload_callback' ),
+			'adas-quote-settings',
+			'adas_quote_settings_section'
+		);
+		add_settings_field(
 			'adas_quote_enable_recaptcha',
 			__( 'Enable reCAPTCHA', 'adas_quote_request' ),
 			array( $this, 'enable_recaptcha_callback' ),
@@ -420,9 +443,6 @@ class ADAS_Quote_Plugin {
 <script type="text/javascript">
 document.addEventListener('DOMContentLoaded', function() {
 
-
-
-
     const recaptchaCheckbox = document.querySelector('input[name="adas_quote_enable_recaptcha"]');
     const recaptchaFields = document.querySelectorAll('.recaptcha-field');
 
@@ -432,7 +452,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    recaptchaCheckbox.addEventListener('change', toggleRecaptchaFields);
+    if (recaptchaCheckbox) {
+        recaptchaCheckbox.addEventListener('change', toggleRecaptchaFields);
+    }
     toggleRecaptchaFields(); // Initial call to set the correct state on page load
 });
 </script>
@@ -441,12 +463,47 @@ document.addEventListener('DOMContentLoaded', function() {
 			);
 	}
 
+
+	/**
+	 * Callback function for displaying the logo upload field.
+	 */
+	public function adas_quote_logo_upload_callback() {
+		$option = get_option( 'adas_user_logo' );
+		echo '<input type="text" id="adas_user_logo" name="adas_user_logo" value="' . esc_attr( $option ) . '" />';
+		echo '<input type="button" class="button" value="' . esc_attr__( 'Upload Logo', 'adas_quote_request' ) . '" id="upload_logo_button" />';
+		echo '<p class="description">' . esc_html__( 'Upload a logo to be used in the email.', 'adas_quote_request' ) . '</p>';
+	}
+	/**
+	 * Callback function for displaying the custom button label input field.
+	 */
+	public function custom_button_label_callback() {
+		$option = get_option( 'adas_quote_custom_button_label', 'Add to quote' );
+		echo '<div class="adas-input-wrapper">
+                <input type="text" id="adas_quote_custom_button_label" name="adas_quote_custom_button_label" value="' . esc_attr( $option ) . '" />
+            </div>';
+	}
+
+	/**
+	 * Callback function for displaying the admin email input field.
+	 */
+	public function admin_email_callback() {
+		$option = get_option( 'adas_quote_admin_email' );
+		if ( empty( $option ) ) {
+			$option = get_option( 'admin_email' );
+		}
+		echo '<div class="adas-input-wrapper">';
+		echo '    <input type="email" name="adas_quote_admin_email" value="' . esc_attr( $option ) . '">';
+		echo '</div>';
+	}
+
 		/**
 		 * Callback function for displaying the reCAPTCHA Site Key input field.
 		 */
 	public function recaptcha_site_key_callback() {
 		$option = get_option( 'adas_quote_recaptcha_site_key' );
-		echo '<input type="text" name="adas_quote_recaptcha_site_key" value="' . esc_attr( $option ) . '" />';
+		echo '<div class="adas-input-wrapper">';
+		echo '    <input type="text" name="adas_quote_recaptcha_site_key" value="' . esc_attr( $option ) . '" />';
+		echo '</div>';
 	}
 
 
@@ -462,7 +519,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	 */
 	public function recaptcha_secret_key_callback() {
 		$option = get_option( 'adas_quote_recaptcha_secret_key' );
-		echo '<input type="text" name="adas_quote_recaptcha_secret_key" value="' . esc_attr( $option ) . '" />';
+		echo '<div class="adas-input-wrapper">';
+		echo '    <input type="text" name="adas_quote_recaptcha_secret_key" value="' . esc_attr( $option ) . '" />';
+		echo '</div>';
 	}
 
 	/**
@@ -470,7 +529,15 @@ document.addEventListener('DOMContentLoaded', function() {
 	 */
 	public function enable_recaptcha_callback() {
 		$option = get_option( 'adas_quote_enable_recaptcha' );
-		echo '<input type="checkbox" name="adas_quote_enable_recaptcha" value="1" ' . checked( 1, $option, false ) . '>';
+		?>
+<div class="adas-toogle">
+    <input type="checkbox" id="adas_quote_enable_recaptcha" name="adas_quote_enable_recaptcha" value="1"
+        <?php checked( 1, get_option( 'adas_quote_enable_recaptcha' ), true ); ?>>
+    <label for="adas_quote_enable_recaptcha"></label>
+</div>
+
+<?php
+		// echo '<input type="checkbox" name="adas_quote_enable_recaptcha" value="1" ' . checked( 1, $option, false ) . '>';
 	}
 
 
@@ -479,14 +546,19 @@ document.addEventListener('DOMContentLoaded', function() {
 	 */
 	public function display_email_errors_callback() {
 		$option = get_option( 'adas_quote_display_email_errors' );
-		echo '<input type="checkbox" name="adas_quote_display_email_errors" value="1" ' . checked( 1, $option, false ) . '>';
+		echo '<div class="adas-toogle">
+                <input type="checkbox" id="adas_quote_display_email_errors" name="adas_quote_display_email_errors" value="1" ' . checked( 1, $option, false ) . '>
+                <label for="adas_quote_display_email_errors"></label>
+            </div>';
 	}
 	/**
 	 * Callback function for displaying the email subject input field.
 	 */
 	public function email_subject_callback() {
 		$option = get_option( 'adas_quote_email_subject' );
-		echo '<input style="width: 300px;" type="text" name="adas_quote_email_subject" value="' . esc_attr( $option ) . '">';
+		echo '<div class="adas-input-wrapper">';
+		echo '    <input type="text" name="adas_quote_email_subject" value="' . esc_attr( $option ) . '">';
+		echo '</div>';
 	}
 
 	/**
@@ -494,7 +566,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	 */
 	public function gmail_smtp_username_callback() {
 		$option = get_option( 'adas_quote_gmail_smtp_username' );
-		echo '<input type="text" name="adas_quote_gmail_smtp_username" value="' . esc_attr( $option ) . '" />';
+		echo '<div class="adas-input-wrapper">';
+		echo '    <input type="text" name="adas_quote_gmail_smtp_username" value="' . esc_attr( $option ) . '" />';
+		echo '</div>';
 	}
 
 	/**
@@ -502,7 +576,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	 */
 	public function gmail_smtp_password_callback() {
 		$option = get_option( 'adas_quote_gmail_smtp_password' );
-		echo '<input type="text" name="adas_quote_gmail_smtp_password" value="' . esc_attr( $option ) . '" />';
+		echo '<div class="adas-input-wrapper">';
+		echo '    <input type="text" name="adas_quote_gmail_smtp_password" value="' . esc_attr( $option ) . '" />';
+		echo '</div>';
 	}
 
 	/**
@@ -535,17 +611,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		);
 	}
 
-	/**
-	 * Callback function for displaying the enable quote checkbox.
-	 */
-	public function enable_quote_callback() {
-		$options = get_option( 'adas_quote_options' );
-		$checked = isset( $options['enable_quote'] ) ? 'checked' : '';
-		printf(
-			'<input type="checkbox" id="enable_quote" name="adas_quote_options[enable_quote]" value="1" %s />',
-			esc_attr( $checked )
-		);
-	}
+
 
 	/**
 	 * Callback function for displaying the settings section description.
@@ -583,36 +649,42 @@ document.addEventListener('DOMContentLoaded', function() {
 		$args  = wp_parse_args( array(), $defaults );
 		$terms = get_terms( array_merge( array( 'taxonomy' => 'product_cat' ), $args ) );
 
-		$saved_product_cat = get_option( 'adas_quote_selected_categories', '' );
+		$saved_product_cats = get_option( 'adas_quote_selected_categories', array() );
 
-		$output  = "<select name='adas_quote_selected_categories' class='dropdown_product_cat'>";
-		$output .= '<option value="" ' . selected( $saved_product_cat, '', false ) . '>' . __( 'Select a category', 'woocommerce' ) . '</option>';
-		$output .= wc_walk_category_dropdown_tree( $terms, 0, array_merge( $args, array( 'selected' => $saved_product_cat ) ) );
+		$select_attributes = apply_filters(
+			'adas_quote_category_dropdown_attributes',
+			array(
+				'name'     => 'adas_quote_selected_categories[]',
+				'class'    => 'dropdown_product_cat',
+				'multiple' => 'multiple',
+				'style'    => 'height: 100px;',
+			)
+		);
 
-		$output      .= '</select>';
+		$output  = '<div class="adas-input-wrapper">';
+		$output .= '    <select';
+		foreach ( $select_attributes as $attr => $value ) {
+			$output .= ' ' . esc_attr( $attr ) . '="' . esc_attr( $value ) . '"';
+		}
+		$output .= '>';
+		$output .= $this->walk_category_dropdown_tree( $terms, 0, $args, $saved_product_cats );
+		$output .= '    </select>';
+		$output .= '</div>';
+
 		$allowed_html = array(
 			'select' => array(
-				'name'  => true,
-				'class' => true,
+				'name'     => true,
+				'class'    => true,
+				'multiple' => true,
+				'style'    => true,
 			),
 			'option' => array(
 				'value'    => true,
 				'selected' => true,
 			),
 		);
-		echo wp_kses( $output, $allowed_html );}
-
-	/**
-	 * Callback function for displaying the admin email input field.
-	 */
-	public function admin_email_callback() {
-		$option = get_option( 'adas_quote_admin_email' );
-		if ( empty( $option ) ) {
-			$option = get_option( 'admin_email' );
-		}
-		echo '<input style="width: 300px;" type="email" name="adas_quote_admin_email" value="' . esc_attr( $option ) . '">';
+		echo wp_kses( $output, $allowed_html );
 	}
-
 		/**
 		 * Callback function for displaying the selected products in a multi-select dropdown.
 		 */
@@ -642,7 +714,8 @@ document.addEventListener('DOMContentLoaded', function() {
 			return;
 		}
 
-		echo '<select multiple name="adas_quote_selected_products[]" style="width: 300px;">';
+		echo '<div class="adas-input-wrapper">';
+		echo '<select multiple name="adas_quote_selected_products[]" style="width: 400px;">';
 		foreach ( $products as $product ) {
 			$product_id  = (int) $product->get_id();
 			$is_selected = isset( $selected_products[ $product_id ] );
@@ -654,6 +727,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			);
 		}
 		echo '</select>';
+		echo '</div>';
 
 		$total_products = wc_get_products(
 			array(
@@ -689,13 +763,43 @@ document.addEventListener('DOMContentLoaded', function() {
 			echo '<span class="pagination-links">' . wp_kses_post( $pagination_links ) . '</span>';
 		}   }
 
+	private function walk_category_dropdown_tree( $terms, $depth, $args, $selected_cats, $current_category = 0 ) {
+		$output = '';
+
+		foreach ( $terms as $term ) {
+			if ( $term->parent != $current_category ) {
+				continue;
+			}
+
+			$pad = str_repeat( '&nbsp;', $depth * 3 );
+
+			$output .= '<option value="' . esc_attr( $term->term_id ) . '"';
+			if ( in_array( $term->term_id, $selected_cats ) ) {
+				$output .= ' selected="selected"';
+			}
+			$output .= '>';
+			$output .= $pad . esc_html( $term->name );
+			if ( $args['show_count'] ) {
+				$output .= '&nbsp;(' . $term->count . ')';
+			}
+			$output .= '</option>';
+
+			$output .= $this->walk_category_dropdown_tree( $terms, $depth + 1, $args, $selected_cats, $term->term_id );
+		}
+
+		return $output;
+	}
+
 
 	/**
 	 * Callback function for displaying the hide add to cart checkbox.
 	 */
 	public function hide_add_to_cart_callback() {
 		$option = get_option( 'adas_quote_hide_add_to_cart' );
-		echo '<input type="checkbox" name="adas_quote_hide_add_to_cart" value="1" ' . checked( 1, $option, false ) . '>';
+		echo '<div class="adas-toogle">
+            <input type="checkbox" id="adas_quote_hide_add_to_cart" name="adas_quote_hide_add_to_cart" value="1" ' . checked( 1, $option, false ) . '>
+            <label for="adas_quote_hide_add_to_cart"></label>
+        </div>';
 	}
 
 	/**
@@ -703,7 +807,10 @@ document.addEventListener('DOMContentLoaded', function() {
 	 */
 	public function adas_quote_show_price_callback() {
 		$option = get_option( 'adas_quote_hide_price' );
-		echo '<input type="checkbox" name="adas_quote_hide_price" value="1" ' . checked( 1, $option, false ) . '>';
+		echo '<div class="adas-toogle">
+                <input type="checkbox" id="adas_quote_hide_price" name="adas_quote_hide_price" value="1" ' . checked( 1, $option, false ) . '>
+                <label for="adas_quote_hide_price"></label>
+            </div>';
 	}
 
 

@@ -68,6 +68,9 @@ function adas_quote_render_list_page() {
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
+/**
+ * Custom List Table Class
+ */
 class Adas_Main_List_Table extends WP_List_Table {
 
 
@@ -165,8 +168,6 @@ class Adas_Main_List_Table extends WP_List_Table {
 		if ( ! $data ) {
 			return;
 		}
-
-		// usort($data, array($this, 'usort_reorder'))
 
 		$current_page = $this->get_pagenum();
 

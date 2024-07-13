@@ -6,6 +6,8 @@
  * Author: Khalidlogi
  * Text Domain: adas_quote_request
  * Domain Path: /languages
+ * License: GPL-2.0+
+ * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
  *
  * @package AdasQuoteForWC
  */
@@ -60,3 +62,4 @@ add_action( 'plugins_loaded', 'adas_quote_init' );
 
 // Register activation hook to create custom table.
 register_activation_hook( __FILE__, array( 'KH_Woo_DB', 'create_kh_woo_table' ) );
+register_uninstall_hook( __FILE__, array( 'KH_Woo_DB', 'delete_kh_woo_table' ) );

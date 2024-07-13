@@ -159,33 +159,32 @@ class Adas_Quote_Form_Details_Ufd {
 			'<div class="welcome-panel-column-container">';
 
 		if ( ! empty( $product_name ) ) {
-			echo '<div class="title-image"><p class="product_name"><b>Product Name:</b> ' . esc_html( $product_name ) . '</p>';
+			echo '<div class="title-image"><p class="product_name"><b>' . esc_html__( 'Product Name:', 'adas_quote_request' ) . '</b> ' . esc_html( $product_name ) . '</p>';
 		}
 
 		if ( ! empty( $product_image ) ) {
-			echo '<p><b></b> <img src="' . esc_url( $product_image ) . '" alt="Product Image" /></p></div>';
+			echo '<p><b></b> <img src="' . esc_url( $product_image ) . '" alt="' . esc_attr__( 'Product Image', 'adas_quote_request' ) . '" /></p></div>';
 		}
 
 		if ( ! empty( $product_quantity ) ) {
-			echo '<p><b>Product Quantity:</b> ' . esc_html( $product_quantity ) . '</p>';
+			echo '<p><b>' . esc_html__( 'Product Quantity:', 'adas_quote_request' ) . '</b> ' . esc_html( $product_quantity ) . '</p>';
 		}
 
 		if ( ! empty( $phone_number ) ) {
-			echo '<p><b>Phone Number:</b> ' . esc_html( $phone_number ) . '</p>';
+			echo '<p><b>' . esc_html__( 'Phone Number:', 'adas_quote_request' ) . '</b> ' . esc_html( $phone_number ) . '</p>';
 		}
 
 		if ( ! empty( $product_type ) ) {
-			echo '<p><b>Product Type:</b> ' . esc_html( $product_type ) . '</p>';
+			echo '<p><b>' . esc_html__( 'Product Type:', 'adas_quote_request' ) . '</b> ' . esc_html( $product_type ) . '</p>';
 		}
 
 		if ( ! empty( $message_quote ) ) {
-			echo '<p><b>Message/Note:</b> ' . nl2br( esc_html( $message_quote ) ) . '</p>';
+			echo '<p><b>' . esc_html__( 'Note:', 'adas_quote_request' ) . '</b> ' . nl2br( esc_html( $message_quote ) ) . '</p>';
 		}
 
 		if ( ! empty( $date_submitted ) ) {
-			echo '<p><b>Submission Date:</b> ' . esc_html( $date_submitted ) . '</p>';
+			echo '<p><b>' . esc_html__( 'Submission Date:', 'adas_quote_request' ) . '</b> ' . esc_html( $date_submitted ) . '</p>';
 		}
-
 		if ( ( $results ) ) {
 			$form_data = ( $results );
 		}

@@ -1,9 +1,16 @@
 <?php
+/**
+ * Custom Quote Request Handler
+ *
+ * This file contains the main class for handling custom quote requests.
+ *
+ * @package AdasQuoteForWC
+ */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'adas_quote_request', 'adas_quote_request' );
 
 /**
  * Class Custom_Quote_Request

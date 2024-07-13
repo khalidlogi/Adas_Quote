@@ -56,6 +56,7 @@ class PluginToolbox {
 	 *
 	 * @param array $data The data for the quote request.
 	 * @return bool True if the email was sent successfully, false otherwise.
+	 * @throws Exception If the email could not be sent.
 	 */
 	public static function send_email( $data ) {
 
@@ -93,8 +94,6 @@ class PluginToolbox {
 			AQ_Error_Logger::log_error( 'SMTP configuration failed, falling back to wp_mail' );
 			return self::send_wp_mail( $to_send, $email_title, $message, $admin_email, $site_title );
 		}
-
-		// AQ_Error_Logger::log_error( 'SMTP configured successfully, attempting to send via SMTP' );
 
 		try {
 			// Recipients.
@@ -153,8 +152,6 @@ class PluginToolbox {
 		$mail->Password   = $password;
 		$mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
 		$mail->Port       = 587;
-
-		// AQ_Error_Logger::log_error( 'SMTP configured with username: ' . $username );
 
 		return $mail;
 	}
@@ -272,6 +269,31 @@ class PluginToolbox {
 		 */
 	private static function generate_email_body( $data, $product ) {
 		ob_start();
+		// $company_logo_url = get_option( 'adas_user_logo' );
+		$company_logo_url = get_option( 'adas_user_logo' );
+		// Convert URL to file path
+		$upload_dir = wp_upload_dir();
+		$base_url   = $upload_dir['baseurl'];
+		$base_dir   = $upload_dir['basedir'];
+			// Replace the base URL with the base directory path
+		$company_logo_path = str_replace( $base_url, $base_dir, $company_logo_url );
+
+		// Ensure the file exists
+		if ( file_exists( $company_logo_path ) ) {
+			$logo_data   = file_get_contents( $company_logo_path );
+			$base64_logo = base64_encode( $logo_data );
+			$mime_type   = mime_content_type( $company_logo_path );
+		} else {
+			error_log( "Logo file not found: $company_logo_path" );
+		}
+		// Read the image file and encode it
+		$logo_data   = file_get_contents( $company_logo_path );
+		$base64_logo = base64_encode( $logo_data );
+		$mime_type   = mime_content_type( $company_logo_path );
+		// Log the base64 encoded image and MIME type
+		error_log( 'Base64 Encoded Image: ' . substr( $base64_logo, 0, 100 ) . '...' );
+		error_log( 'MIME Type: ' . $mime_type );
+
 		?>
 <!DOCTYPE html>
 <html lang="en">
@@ -283,6 +305,13 @@ class PluginToolbox {
 </head>
 
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
+		<?php if ( $base64_logo ) : ?>
+	<div style="text-align: center; margin-bottom: 20px;">
+		<img src="data:<?php echo esc_attr( $mime_type ); ?>;base64,<?php echo esc_attr( $base64_logo ); ?>"
+			alt="<?php esc_attr_e( 'Company Logo', 'adas_quote_request' ); ?>" style="max-width: 200px; height: auto;">
+	</div>
+	<?php endif; ?>
+
 	<h1 style="color: #0066cc; text-align: center;"><?php esc_html_e( 'Quote Request', 'adas_quote_request' ); ?></h1>
 
 	<p style="font-size: 16px;">

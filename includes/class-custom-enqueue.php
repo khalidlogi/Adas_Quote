@@ -17,7 +17,10 @@ class Custom_Enqueue {
 	 * Enqueue custom CSS for the admin settings page.
 	 */
 	public static function adas_quote_admin_styles() {
-		wp_enqueue_style( 'adas-quote-admin-styles', plugin_dir_url( __FILE__ ) . '../css/admin-styles.css' );
+		wp_enqueue_style( 'adas-quote-admin-styles', plugin_dir_url( __FILE__ ) . '../css/admin-styles.css', array(), '1.0.0' );
+
+		wp_enqueue_media();
+		wp_enqueue_script( 'adas-admin-script', plugin_dir_url( __FILE__ ) . '../js/admin-script.js', array( 'jquery' ), '1.0.0', true );
 	}
 
 
@@ -40,7 +43,7 @@ class Custom_Enqueue {
 		);
 
 		if ( get_option( 'adas_quote_recaptcha_site_key' ) && get_option( 'adas_quote_recaptcha_secret_key' ) ) {
-			wp_enqueue_script( 'recaptcha', 'https://www.google.com/recaptcha/api.js' );
+			wp_enqueue_script( 'recaptcha', 'https://www.google.com/recaptcha/api.js', array(), null, true );
 		}
 
 		// Enqueue Bootstrap JS.
