@@ -16,13 +16,25 @@ class Custom_Enqueue {
 	/**
 	 * Enqueue custom CSS for the admin settings page.
 	 */
-	public static function adas_quote_admin_styles() {
+	public static function adas_quote_admin_styles( $hook_suffix ) {
+		// Check for the correct page
+		if ( 'settings_page_adas-quote-settings' !== $hook_suffix ) {
+			return;
+		}
+
 		wp_enqueue_style( 'adas-quote-admin-styles', plugin_dir_url( __FILE__ ) . '../css/admin-styles.css', array(), '1.0.0' );
 
 		wp_enqueue_media();
 		wp_enqueue_script( 'adas-admin-script', plugin_dir_url( __FILE__ ) . '../js/admin-script.js', array( 'jquery' ), '1.0.0', true );
-	}
+		wp_enqueue_script( 'adas-quote-user-roles', plugin_dir_url( __FILE__ ) . '../js/adas-quote-user-roles.js', array( 'jquery' ), '1.0.0', true );
 
+		// Localize the script with new data
+		$script_data = array(
+			'roles'      => wp_roles()->get_names(),
+			'savedRoles' => get_option( 'adas_quote_user_roles', '' ),
+		);
+		wp_localize_script( 'adas-quote-user-roles', 'adasQuoteUserRoles', $script_data );
+	}
 
 	/**
 	 * Enqueue necessary scripts and styles for the front-end.

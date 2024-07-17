@@ -306,6 +306,19 @@ class ADAS_Quote_Plugin {
 			'adas_quote_settings_group',
 			'adas_user_logo'
 		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_user_roles'
+		);
+
+		// Add the field to your settings section
+		add_settings_field(
+			'adas_quote_user_roles',
+			'Enable Quote Only for Specific User Roles',
+			array( $this, 'adas_quote_user_roles_callback' ),
+			'adas-quote-settings',
+			'adas_quote_settings_section'
+		);
 
 		add_settings_field(
 			'adas_quote_custom_button_label',
@@ -461,6 +474,25 @@ document.addEventListener('DOMContentLoaded', function() {
 <?php
 				}
 			);
+	}
+
+
+	// Callback function to render the field
+	function adas_quote_user_roles_callback() {
+		$saved_roles = get_option( 'adas_quote_user_roles', '' );
+		?>
+<div class="role-select-container">
+    <input type="text" id="quote-user-roles" readonly placeholder="Click to select roles">
+    <div id="role-dropdown" class="role-dropdown">
+        <!-- Roles will be populated here by JavaScript -->
+    </div>
+</div>
+<div id="selected-roles" class="selected-roles"></div>
+<input type="hidden" id="quote-user-roles-hidden" name="adas_quote_user_roles"
+    value="<?php echo esc_attr( $saved_roles ); ?>">
+<script>
+</script>
+<?php
 	}
 
 

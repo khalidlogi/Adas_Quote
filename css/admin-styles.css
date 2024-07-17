@@ -316,7 +316,7 @@ p.product_name {
 .adas-input-wrapper select[multiple] {
     width: 300px;
     padding: 10px 14px;
-    font-size: 16px;
+    font-size: 15px;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
@@ -334,3 +334,44 @@ p.product_name {
     display: block;
 }
 
+.role-select-container {
+    position: relative;
+    width: 300px;
+}
+#quote-user-roles {
+    width: 100%;
+    padding: 5px;
+    cursor: pointer;
+}
+.role-dropdown {
+    display: none;
+    position: absolute;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background-color: white;
+    z-index: 1000;
+}
+.role-option {
+    padding: 5px;
+    cursor: pointer;
+}
+.role-option:hover {
+    background-color: #f0f0f0;
+}
+.selected-roles {
+    margin-top: 10px;
+}
+.adas-role-tag {
+    display: inline-block;
+    background-color: #e0e0e0;
+    padding: 2px 5px;
+    margin: 2px;
+    border-radius: 3px;
+}
+.adas-role-tag .remove {
+    cursor: pointer;
+    color: #888;
+    margin-left: 5px;
+}
