@@ -3,6 +3,12 @@ jQuery(document).ready(function ($) {
     const customQuantityInput = $('.product_quantity');
     const customQuoteForm = $('#custom-quote-form');
     const quoteSuccessModal = $('#quoteSuccessModal');
+    $('#quoteSuccessModal').modal({show: false});
+    
+ // Handle the close button click
+ $('.modal .close, .modal .btn-close, [data-dismiss="modal"]').on('click', function() {
+    $(this).closest('.modal').modal('hide');
+});
 
     function updateCustomQuantityInput() {
         customQuantityInput.val(wooCommerceQuantityInput.val());
@@ -111,13 +117,16 @@ jQuery(document).ready(function ($) {
                 if (response.success) {
                     console.log('Quote request successful:', response.data);
                     quoteSuccessModal.modal('show');
+                    customQuoteForm[0].reset();  // Reset the form.
                 } else {
                     console.error('Quote request failed:', response.data);
                     alert('Failed to send quote request: ' + response.data);
                 }
                 $('#loadingIndicator').hide();
 
-                grecaptcha.reset();
+                if (typeof grecaptcha !== 'undefined' && $('.g-recaptcha').length > 0) {
+                    grecaptcha.reset();
+                }
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 console.error('AJAX Error:', {
@@ -127,7 +136,9 @@ jQuery(document).ready(function ($) {
                     textStatus: textStatus,
                     errorThrown: errorThrown
                 });
-                grecaptcha.reset();
+                if (typeof grecaptcha !== 'undefined' && $('.g-recaptcha').length > 0) {
+                    grecaptcha.reset();
+                }
                 alert('An error occurred while sending the quote request. Please check the console for more details.');
             },
             complete: function() {
