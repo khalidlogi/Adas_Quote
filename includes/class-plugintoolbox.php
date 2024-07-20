@@ -112,8 +112,10 @@ class PluginToolbox {
 			AQ_Error_Logger::log_error( 'Email sent successfully via SMTP' );
 
 			// Send admin notification.
-			$message_to_admin = '<p>' . sprintf( esc_html__( 'Quote has been sent to %s', 'adas_quote_request' ), esc_html( $to_send ) ) . '</p>';
-			$admin_notified   = self::send_admin_notification( $admin_email, $to_send, $message_to_admin );
+			$message_to_admin  = '<p>' . sprintf( esc_html__( 'A new quote request has been received from %s.', 'adas_quote_request' ), esc_html( $to_send ) ) . '</p>';
+			$message_to_admin .= '<p>' . esc_html__( 'Please review the details of the quote request in the admin panel.', 'adas_quote_request' ) . '</p>';
+			$message_to_admin .= '<p><a href="' . esc_url( admin_url( 'admin.php?page=adas_list' ) ) . '">' . esc_html__( 'Go to Admin Panel', 'adas_quote_request' ) . '</a></p>';
+			$admin_notified    = self::send_admin_notification( $admin_email, $to_send, $message_to_admin );
 			if ( ! $admin_notified ) {
 				AQ_Error_Logger::log_error( 'Failed to send admin notification' );
 			} else {
@@ -178,7 +180,7 @@ class PluginToolbox {
 			sprintf( 'From: %s <%s>', esc_html( $from_name ), $from_email ),
 		);
 
-		// Add an action to capture PHPMailer errors
+		// Add an action to capture PHPMailer errors.
 		add_action(
 			'wp_mail_failed',
 			function ( $wp_error ) {
@@ -271,28 +273,49 @@ class PluginToolbox {
 		ob_start();
 		// $company_logo_url = get_option( 'adas_user_logo' );
 		$company_logo_url = get_option( 'adas_user_logo' );
-		// Convert URL to file path
+		// If no logo is selected, use the default
+		if ( empty( $company_logo_url ) ) {
+			// $company_logo_url = plugin_dir_url( __DIR__ ) . 'assets/logo-email/logo-color.png';
+			$company_logo_url = plugin_dir_url( __DIR__ ) . 'assets/logo-email/logo-color.png';
+
+		}
+		// Convert URL to file path.
 		$upload_dir = wp_upload_dir();
 		$base_url   = $upload_dir['baseurl'];
 		$base_dir   = $upload_dir['basedir'];
-			// Replace the base URL with the base directory path
+			// Replace the base URL with the base directory path.
 		$company_logo_path = str_replace( $base_url, $base_dir, $company_logo_url );
 
-		// Ensure the file exists
-		if ( file_exists( $company_logo_path ) ) {
-			$logo_data   = file_get_contents( $company_logo_path );
-			$base64_logo = base64_encode( $logo_data );
-			$mime_type   = mime_content_type( $company_logo_path );
+				// Check if it's the default logo or a user-uploaded one.
+		if ( strpos( $company_logo_url, 'assets/logo-email/logo-color.png' ) !== false ) {
+			$company_logo_path = plugin_dir_path( __DIR__ ) . 'assets/logo-email/logo-color.png';
 		} else {
-			error_log( "Logo file not found: $company_logo_path" );
+			// Replace the base URL with the base directory path for user-uploaded logos.
+			$company_logo_path = str_replace( $base_url, $base_dir, $company_logo_url );
 		}
-		// Read the image file and encode it
+
+		// Ensure the file exists.
+		if ( file_exists( $company_logo_path ) ) {
+			$response = wp_remote_get( $company_logo_url );
+			if ( is_wp_error( $response ) ) {
+				// Handle error.
+				error_log( 'Error fetching logo: ' . $response->get_error_message() );
+			} else {
+				$logo_data   = wp_remote_retrieve_body( $response );
+				$base64_logo = base64_encode( $logo_data );
+				$mime_type   = wp_remote_retrieve_header( $response, 'content-type' );
+			}
+		} else {
+			// error_log( "Logo file not found: $company_logo_path" );
+		}
+
+		// Read the image file and encode it.
 		$logo_data   = file_get_contents( $company_logo_path );
 		$base64_logo = base64_encode( $logo_data );
 		$mime_type   = mime_content_type( $company_logo_path );
-		// Log the base64 encoded image and MIME type
-		error_log( 'Base64 Encoded Image: ' . substr( $base64_logo, 0, 100 ) . '...' );
-		error_log( 'MIME Type: ' . $mime_type );
+		// Log the base64 encoded image and MIME type.
+		// error_log( 'Base64 Encoded Image: ' . substr( $base64_logo, 0, 100 ) . '...' );
+		// error_log( 'MIME Type: ' . $mime_type );
 
 		?>
 <!DOCTYPE html>

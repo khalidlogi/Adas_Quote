@@ -4,8 +4,8 @@ jQuery(document).ready(function ($) {
     const customQuoteForm = $('#custom-quote-form');
     const quoteSuccessModal = $('#quoteSuccessModal');
     $('#quoteSuccessModal').modal({show: false});
-    
- // Handle the close button click
+
+ // Handle the close button click.
  $('.modal .close, .modal .btn-close, [data-dismiss="modal"]').on('click', function() {
     $(this).closest('.modal').modal('hide');
 });

@@ -45,11 +45,10 @@ class QuoteButtonForm {
 	private static function should_display_based_on_stock_status( $product ) {
 		$stock_status = $product->get_stock_status();
 			// Get the stock status option.
-		$stock_status_option = get_option( 'adas_quote_stock_status_option', 'show_for_all' );
+		$stock_status_option = get_option( 'adas_quote_stock_status_option', '' );
 
 		switch ( $stock_status_option ) {
-			case 'show_for_all':
-				return true; // Show for all if option is set to 'Show for all'.
+
 			case 'hide_for_outofstock':
 				if ( $stock_status === 'outofstock' ) {
 					return false;
@@ -59,7 +58,7 @@ class QuoteButtonForm {
 					return true;
 				}
 			default:
-				return true; // Default to showing for all if option is not recognized
+				return false; // Default to showing for all if option is not recognized
 		}
 	}
 	/**
@@ -81,21 +80,25 @@ class QuoteButtonForm {
 		$should_display = self::should_display_based_on_stock_status( $product );
 
 		if ( ! $should_display ) {
+			error_log( 'should_display_based_on_stock_status' );
 			$product_matches = false;
 		} else {
+			error_log( 'should_display_based_on_stock_status passed' );
 			$product_matches = true;
 		}
 
 			// Check for parent categories and add their children.
 		$updated_categories = array();
-		foreach ( $selected_categories as $category_id ) {
-			$updated_categories[] = $category_id;
+		if ( is_array( $selected_categories ) ) {
+			foreach ( $selected_categories as $category_id ) {
+				$updated_categories[] = $category_id;
 
-			// Get children of this category
-			$children = get_term_children( $category_id, 'product_cat' );
+				// Get children of this category
+				$children = get_term_children( $category_id, 'product_cat' );
 
-			if ( ! is_wp_error( $children ) && ! empty( $children ) ) {
-				$updated_categories = array_merge( $updated_categories, $children );
+				if ( ! is_wp_error( $children ) && ! empty( $children ) ) {
+					$updated_categories = array_merge( $updated_categories, $children );
+				}
 			}
 		}
 
@@ -105,7 +108,7 @@ class QuoteButtonForm {
 		// Get the current product categories.
 		$current_categories = wp_get_post_terms( $product->get_id(), 'product_cat' );
 
-		if ( in_array( $product->get_id(), $selected_products ) ) {
+		if ( is_array( $selected_products ) && in_array( $product->get_id(), $selected_products ) ) {
 			$product_matches = true;
 		} else {
 			foreach ( $current_categories as $category ) {

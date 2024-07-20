@@ -79,16 +79,16 @@ class ADAS_Quote_Plugin {
 	public function no_products_notice() {
 		?>
 <div class="notice notice-warning">
-	<p>
-		<?php
+    <p>
+        <?php
 		esc_html_e(
 			'No products found. Please create at least one product to use Adas Quote Plugin effectively.',
 			'adas_quote_request'
 		);
 		?>
-	</p>
+    </p>
 </div>
-		<?php
+<?php
 	}
 
 	/**
@@ -97,10 +97,10 @@ class ADAS_Quote_Plugin {
 	public function woocommerce_missing_notice() {
 		?>
 <div class="notice notice-error">
-	<p><?php esc_html_e( 'Adas Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.', 'adas_quote_request' ); ?>
-	</p>
+    <p><?php esc_html_e( 'Adas Quote Plugin requires WooCommerce to be installed and active. Please install and activate WooCommerce to use this plugin.', 'adas_quote_request' ); ?>
+    </p>
 </div>
-		<?php
+<?php
 	}
 
 	/**
@@ -109,7 +109,7 @@ class ADAS_Quote_Plugin {
 	public function create_admin_page() {
 		?>
 <div class="wrap">
-		<?php
+    <?php
 		if ( ! $this->check_woocommerce() ) {
 			$this->woocommerce_missing_notice();
 		} elseif ( ! $this->check_products_exist() ) {
@@ -127,7 +127,7 @@ class ADAS_Quote_Plugin {
 
 		?>
 </div>
-		<?php
+<?php
 	}
 
 
@@ -314,6 +314,18 @@ class ADAS_Quote_Plugin {
 			'adas_quote_settings_group',
 			'adas_quote_stock_status_option'
 		);
+		register_setting(
+			'adas_quote_settings_group',
+			'adas_quote_confirmation_message'
+		);
+
+		add_settings_field(
+			'adas_quote_confirmation_message',
+			__( 'Confirmation Message', 'adas_quote_request' ),
+			array( $this, 'confirmation_message_callback' ),
+			'adas-quote-settings',
+			'adas_email_notifications_section'
+		);
 
 		add_settings_field(
 			'adas_quote_stock_status_option',
@@ -346,6 +358,13 @@ class ADAS_Quote_Plugin {
 			array( $this, 'settings_section_callback' ),
 			'adas-quote-settings'
 		);
+		add_settings_section(
+			'adas_email_notifications_section',
+			__( 'Email/Notifications', 'adas_quote_request' ),
+			array( $this, 'email_notifications_section_callback' ),
+			'adas-quote-settings'
+		);
+
 		add_settings_section(
 			'adas_smtp_settings_section',
 			__( 'SMTP Settings', 'adas_quote_request' ),
@@ -413,21 +432,21 @@ class ADAS_Quote_Plugin {
 			__( 'Custom Email Message', 'adas_quote_request' ),
 			array( $this, 'adas_quote_custom_email_message_callback' ),
 			'adas-quote-settings',
-			'adas_quote_settings_section'
+			'adas_email_notifications_section'
 		);
 		add_settings_field(
 			'adas_quote_email_subject',
 			__( 'Email Subject', 'adas_quote_request' ),
 			array( $this, 'email_subject_callback' ),
 			'adas-quote-settings',
-			'adas_quote_settings_section'
+			'adas_email_notifications_section'
 		);
 		add_settings_field(
 			'adas_quote_admin_email',
 			__( 'Admin Email', 'adas_quote_request' ),
 			array( $this, 'admin_email_callback' ),
 			'adas-quote-settings',
-			'adas_quote_settings_section'
+			'adas_email_notifications_section'
 		);
 		add_settings_field(
 			'adas_user_logo',
@@ -468,51 +487,64 @@ class ADAS_Quote_Plugin {
 <script type="text/javascript">
 document.addEventListener('DOMContentLoaded', function() {
 
-	const recaptchaCheckbox = document.querySelector('input[name="adas_quote_enable_recaptcha"]');
-	const recaptchaFields = document.querySelectorAll('.recaptcha-field');
+    const recaptchaCheckbox = document.querySelector('input[name="adas_quote_enable_recaptcha"]');
+    const recaptchaFields = document.querySelectorAll('.recaptcha-field');
 
-	function toggleRecaptchaFields() {
-		recaptchaFields.forEach(field => {
-			field.closest('tr').style.display = recaptchaCheckbox.checked ? '' : 'none';
-		});
-	}
+    function toggleRecaptchaFields() {
+        recaptchaFields.forEach(field => {
+            field.closest('tr').style.display = recaptchaCheckbox.checked ? '' : 'none';
+        });
+    }
 
-	if (recaptchaCheckbox) {
-		recaptchaCheckbox.addEventListener('change', toggleRecaptchaFields);
-	}
-	toggleRecaptchaFields(); // Initial call to set the correct state on page load
+    if (recaptchaCheckbox) {
+        recaptchaCheckbox.addEventListener('change', toggleRecaptchaFields);
+    }
+    toggleRecaptchaFields(); // Initial call to set the correct state on page load
 });
 </script>
-					<?php
+<?php
 				}
 			);
 	}
 
+	/**
+	 * Callback function for the Email/Notifications settings section.
+	 */
+	public function email_notifications_section_callback() {
+		echo '<p>' . esc_html__( 'Configure the email and notification settings for the quote request form.', 'adas_quote_request' ) . '</p>';
+	}
+
+	/**
+	 * Callback function for displaying the confirmation message input field.
+	 */
+	public function confirmation_message_callback() {
+		$option = get_option( 'adas_quote_confirmation_message', 'Your quote request has been sent successfully! A confirmation email has been sent to your email.' );
+		echo '<div class="adas-input-wrapper">';
+		echo '    <textarea name="adas_quote_confirmation_message" rows="2" style="width: 50%;">' . esc_textarea( $option ) . '</textarea>';
+		echo '</div>';
+	}
 
 	/**
 	 * Callback function for displaying the stock status option dropdown.
 	 */
 	public function stock_status_option_callback() {
-		$option = get_option( 'adas_quote_stock_status_option', 'all' );
+		$option = get_option( 'adas_quote_stock_status_option', '' );
 		?>
 <select name="adas_quote_stock_status_option" id="adas_quote_stock_status_option" class="adas-select">
-	<option value="" disabled <?php selected( $option, '' ); ?>>
-		<?php _e( 'Select an option', 'adas_quote_request' ); ?>
-	</option>
-	<option value="show_for_all" <?php selected( $option, 'show_for_all' ); ?>>
-		<?php _e( 'Show Add to Quote Button for all products', 'adas_quote_request' ); ?>
-	</option>
-	<option value="hide_for_outofstock" <?php selected( $option, 'hide_for_outofstock' ); ?>>
-		<?php _e( 'Hide Add to Quote Button for Out of Stock products', 'adas_quote_request' ); ?>
-	</option>
-	<option value="out_of_stock_only" <?php selected( $option, 'out_of_stock_only' ); ?>>
-		<?php _e( 'Show Add to Quote Button for only Out of Stock products', 'adas_quote_request' ); ?>
-	</option>
+    <option value="" disabled selected>
+        <?php _e( 'Select stock status option', 'adas_quote_request' ); ?>
+    </option>
+    <option value="hide_for_outofstock" <?php selected( $option, 'hide_for_outofstock' ); ?>>
+        <?php _e( 'Hide Add to Quote Button for Out of Stock products', 'adas_quote_request' ); ?>
+    </option>
+    <option value="out_of_stock_only" <?php selected( $option, 'out_of_stock_only' ); ?>>
+        <?php _e( 'Show Add to Quote Button for only Out of Stock products', 'adas_quote_request' ); ?>
+    </option>
 </select>
 <p class="description">
-		<?php _e( 'Choose when to display the Add to Quote button based on product stock status.', 'adas_quote_request' ); ?>
+    <?php _e( 'Choose when to display the Add to Quote button based on product stock status.', 'adas_quote_request' ); ?>
 </p>
-		<?php
+<?php
 	}
 
 	// Callback function to render the field
@@ -520,17 +552,17 @@ document.addEventListener('DOMContentLoaded', function() {
 		$saved_roles = get_option( 'adas_quote_user_roles', '' );
 		?>
 <div class="role-select-container">
-	<input type="text" id="quote-user-roles" readonly placeholder="Click to select roles">
-	<div id="role-dropdown" class="role-dropdown">
-		<!-- Roles will be populated here by JavaScript -->
-	</div>
+    <input type="text" id="quote-user-roles" readonly placeholder="Click to select roles">
+    <div id="role-dropdown" class="role-dropdown">
+        <!-- Roles will be populated here by JavaScript -->
+    </div>
 </div>
 <div id="selected-roles" class="selected-roles"></div>
 <input type="hidden" id="quote-user-roles-hidden" name="adas_quote_user_roles"
-	value="<?php echo esc_attr( $saved_roles ); ?>">
+    value="<?php echo esc_attr( $saved_roles ); ?>">
 <script>
 </script>
-		<?php
+<?php
 	}
 
 
@@ -601,12 +633,12 @@ document.addEventListener('DOMContentLoaded', function() {
 		$option = get_option( 'adas_quote_enable_recaptcha' );
 		?>
 <div class="adas-toogle">
-	<input type="checkbox" id="adas_quote_enable_recaptcha" name="adas_quote_enable_recaptcha" value="1"
-		<?php checked( 1, get_option( 'adas_quote_enable_recaptcha' ), true ); ?>>
-	<label for="adas_quote_enable_recaptcha"></label>
+    <input type="checkbox" id="adas_quote_enable_recaptcha" name="adas_quote_enable_recaptcha" value="1"
+        <?php checked( 1, get_option( 'adas_quote_enable_recaptcha' ), true ); ?>>
+    <label for="adas_quote_enable_recaptcha"></label>
 </div>
 
-		<?php
+<?php
 		// echo '<input type="checkbox" name="adas_quote_enable_recaptcha" value="1" ' . checked( 1, $option, false ) . '>';
 	}
 
@@ -844,7 +876,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			$pad = str_repeat( '&nbsp;', $depth * 3 );
 
 			$output .= '<option value="' . esc_attr( $term->term_id ) . '"';
-			if ( in_array( $term->term_id, $selected_cats ) ) {
+			if ( is_array( $selected_cats ) && in_array( $term->term_id, $selected_cats ) ) {
 				$output .= ' selected="selected"';
 			}
 			$output .= '>';
@@ -889,7 +921,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	 */
 	public function adas_quote_custom_email_message_callback() {
 		$option = get_option( 'adas_quote_custom_email_message' );
-		echo '<textarea name="adas_quote_custom_email_message" rows="5" cols="50">' . esc_textarea( $option ) . '</textarea>';
+		echo '<textarea name="adas_quote_custom_email_message" rows="2" style="width: 50%;">' . esc_textarea( $option ) . '</textarea>';
 	}
 	/**
 	 * Callback function for displaying the custom email subject.
@@ -897,12 +929,12 @@ document.addEventListener('DOMContentLoaded', function() {
 	private function display_settings_form() {
 		?>
 <form method="post" action="options.php">
-		<?php
+    <?php
 			settings_fields( 'adas_quote_settings_group' );
 			do_settings_sections( 'adas-quote-settings' );
 			submit_button();
 		?>
 </form>
-		<?php
+<?php
 	}
 }
