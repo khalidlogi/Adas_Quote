@@ -273,9 +273,8 @@ class PluginToolbox {
 		ob_start();
 		// $company_logo_url = get_option( 'adas_user_logo' );
 		$company_logo_url = get_option( 'adas_user_logo' );
-		// If no logo is selected, use the default
+		// If no logo is selected, use the default.
 		if ( empty( $company_logo_url ) ) {
-			// $company_logo_url = plugin_dir_url( __DIR__ ) . 'assets/logo-email/logo-color.png';
 			$company_logo_url = plugin_dir_url( __DIR__ ) . 'assets/logo-email/logo-color.png';
 
 		}
@@ -305,8 +304,6 @@ class PluginToolbox {
 				$base64_logo = base64_encode( $logo_data );
 				$mime_type   = wp_remote_retrieve_header( $response, 'content-type' );
 			}
-		} else {
-			// error_log( "Logo file not found: $company_logo_path" );
 		}
 
 		// Read the image file and encode it.

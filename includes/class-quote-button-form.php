@@ -50,15 +50,13 @@ class QuoteButtonForm {
 		switch ( $stock_status_option ) {
 
 			case 'hide_for_outofstock':
-				if ( $stock_status === 'outofstock' ) {
-					return false;
-				}
+				return 'outofstock' !== $stock_status;
+
 			case 'out_of_stock_only':
-				if ( $stock_status === 'outofstock' ) {
-					return true;
-				}
+				return 'outofstock' === $stock_status;
+
 			default:
-				return false; // Default to showing for all if option is not recognized
+				return false; // Default to showing for all if option is not recognized.
 		}
 	}
 	/**
@@ -76,14 +74,12 @@ class QuoteButtonForm {
 		// Get the selected categories from the options.
 		$selected_categories = get_option( 'adas_quote_selected_categories', array() );
 
-		// Check if we should display the form based on stock status
+		// Check if we should display the form based on stock status.
 		$should_display = self::should_display_based_on_stock_status( $product );
 
 		if ( ! $should_display ) {
-			error_log( 'should_display_based_on_stock_status' );
 			$product_matches = false;
 		} else {
-			error_log( 'should_display_based_on_stock_status passed' );
 			$product_matches = true;
 		}
 
@@ -93,7 +89,7 @@ class QuoteButtonForm {
 			foreach ( $selected_categories as $category_id ) {
 				$updated_categories[] = $category_id;
 
-				// Get children of this category
+				// Get children of this category.
 				$children = get_term_children( $category_id, 'product_cat' );
 
 				if ( ! is_wp_error( $children ) && ! empty( $children ) ) {
@@ -127,7 +123,7 @@ class QuoteButtonForm {
 
 		// Get the product type.
 		$product_     = wc_get_product( get_the_ID() );
-		$product_type = ( $product_->get_type() == 'variation' ) ? 'variation' : $product_->get_type();
+		$product_type = ( $product_->get_type() === 'variation' ) ? 'variation' : $product_->get_type();
 
 		// Get the user email if logged in.
 		$user_email = '';

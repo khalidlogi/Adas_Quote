@@ -1,6 +1,5 @@
 jQuery(document).ready(function($){
     $('#upload_logo_button').click(function(e) {
-        alert('Logo uploaded successfully!');
         e.preventDefault();
         var image = wp.media({ 
             title: 'Upload Image',

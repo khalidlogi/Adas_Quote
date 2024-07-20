@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Display the quote button form.
  *
